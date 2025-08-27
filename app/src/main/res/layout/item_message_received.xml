@@ -1,12 +1,28 @@
-<!-- res/layout/item_message_received.xml -->
-<TextView xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/textMessage"
-    android:layout_width="wrap_content"
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@drawable/bg_message_received"
-    android:padding="10dp"
-    android:text="Hi there!"
-    android:textColor="@android:color/black"
-    android:layout_gravity="start"
-    android:maxWidth="250dp"
-    android:layout_margin="8dp"/>
+    android:gravity="start"
+    android:orientation="vertical"
+    android:padding="8dp">
+
+    <TextView
+        android:id="@+id/textMessage"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@drawable/bg_message_received"
+        android:padding="10dp"
+        android:text="Received message"
+        android:textColor="@android:color/black"
+        android:textSize="16sp" />
+
+    <TextView
+        android:id="@+id/message_time"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:text="10:01 AM"
+        android:textSize="12sp"
+        android:textColor="@android:color/darker_gray" />
+
+</LinearLayout>
