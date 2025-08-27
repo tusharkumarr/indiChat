@@ -1,7 +1,11 @@
 package com.messenger.indiChat.models
 
 data class ChatMessage(
-    val message: String,
-    val isSent: Boolean,  // true if sent by user, false if received
-    val time: String
+    val senderId: String,
+    val receiverId: String,
+    val content: String,
+    val timestamp: String?,       // server-generated timestamp
+    val delivered: Boolean,
+    var displayTime: String? = null // client-only display
 )
+

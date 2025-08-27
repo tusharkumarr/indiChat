@@ -22,7 +22,7 @@ class ChatAdapter(private val messages: List<ChatMessage>) :
     }
 
     override fun getItemViewType(position: Int): Int {
-        return if (messages[position].isSent) VIEW_TYPE_SENT else VIEW_TYPE_RECEIVED
+        return if (messages[position].delivered) VIEW_TYPE_SENT else VIEW_TYPE_RECEIVED
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ChatViewHolder {
@@ -37,8 +37,8 @@ class ChatAdapter(private val messages: List<ChatMessage>) :
 
     override fun onBindViewHolder(holder: ChatViewHolder, position: Int) {
         val msg = messages[position]
-        holder.messageText.text = msg.message
-        holder.timeText.text = msg.time
+        holder.messageText.text = msg.content
+        holder.timeText.text = msg.displayTime
     }
 
     override fun getItemCount() = messages.size

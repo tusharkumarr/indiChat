@@ -12,71 +12,61 @@ import com.messenger.indiChat.network.ChatWebSocketManager
 import java.text.SimpleDateFormat
 import java.util.*
 
-class MainActivity : AppCompatActivity(), ChatWebSocketManager.ChatListener {
+class MainActivity : AppCompatActivity() {
 
-    private lateinit var recyclerView: RecyclerView
-    private lateinit var adapter: ChatAdapter
+    private lateinit var chatAdapter: ChatAdapter
     private val messages = mutableListOf<ChatMessage>()
-    private lateinit var webSocketManager: ChatWebSocketManager
+    private lateinit var chatWebSocketManager: ChatWebSocketManager
+
+    private val currentUserId = "user1"
+    private val receiverId = "user2"
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        recyclerView = findViewById(R.id.chatRecyclerView)
-        val editMessage = findViewById<EditText>(R.id.inputMessage)
+        val recyclerView = findViewById<RecyclerView>(R.id.chatRecyclerView)
+        val editText = findViewById<EditText>(R.id.inputMessage)
         val sendButton = findViewById<ImageButton>(R.id.buttonSend)
 
+        chatAdapter = ChatAdapter(messages)
         recyclerView.layoutManager = LinearLayoutManager(this)
-        adapter = ChatAdapter(messages)
-        recyclerView.adapter = adapter
+        recyclerView.adapter = chatAdapter
 
-        // Initialize WebSocket Manager
-        webSocketManager = ChatWebSocketManager(this)
-        webSocketManager.connect()
-
-        sendButton.setOnClickListener {
-            val text = editMessage.text.toString().trim()
-            if (text.isNotEmpty()) {
-                webSocketManager.sendMessage(text)
-                val newMessage = ChatMessage(text, true, getCurrentTime())
-                messages.add(newMessage)
-                adapter.notifyItemInserted(messages.size - 1)
+        chatWebSocketManager = ChatWebSocketManager { msg ->
+            runOnUiThread {
+                messages.add(msg.copy(delivered = false))
+                chatAdapter.notifyItemInserted(messages.size - 1)
                 recyclerView.scrollToPosition(messages.size - 1)
-                editMessage.text.clear()
             }
         }
+
+        chatWebSocketManager.connect()
+
+        sendButton.setOnClickListener {
+            val text = editText.text.toString()
+            if (text.isNotBlank()) {
+                // Local display time
+                val displayTime = SimpleDateFormat("HH:mm", Locale.getDefault()).format(Date())
+
+                // Prepare message to send (no timestamp!)
+                val msg = ChatMessage(currentUserId, receiverId, text, null, true)
+
+                // Show immediately with local display time
+                msg.displayTime = displayTime  // add a new field 'displayTime' in ChatMessage for client-side use
+                messages.add(msg)
+                chatAdapter.notifyItemInserted(messages.size - 1)
+                recyclerView.scrollToPosition(messages.size - 1)
+                editText.text.clear()
+
+                chatWebSocketManager.sendMessage(msg) // server will set proper timestamp
+            }
+        }
+
     }
 
     override fun onDestroy() {
-        webSocketManager.disconnect()
         super.onDestroy()
-    }
-
-    // ChatWebSocketManager.ChatListener implementation
-    override fun onConnected() {
-        println("Connected to WebSocket")
-    }
-
-    override fun onDisconnected() {
-        println("Disconnected from WebSocket")
-    }
-
-    override fun onMessageReceived(message: String, isSent: Boolean, timestamp: String?) {
-        runOnUiThread {
-            val newMessage = ChatMessage(message, isSent, timestamp ?: getCurrentTime())
-            messages.add(newMessage)
-            adapter.notifyItemInserted(messages.size - 1)
-            recyclerView.scrollToPosition(messages.size - 1)
-        }
-    }
-
-    override fun onError(error: Throwable?) {
-        error?.printStackTrace()
-    }
-
-    private fun getCurrentTime(): String {
-        val sdf = SimpleDateFormat("hh:mm a", Locale.getDefault())
-        return sdf.format(Date())
+        chatWebSocketManager.disconnect()
     }
 }

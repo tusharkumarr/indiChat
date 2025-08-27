@@ -1,87 +1,73 @@
 package com.messenger.indiChat.network
 
 import android.util.Log
+import com.google.gson.Gson
+import com.messenger.indiChat.models.ChatMessage
+import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.Disposable
-import org.json.JSONObject
 import ua.naiksoftware.stomp.Stomp
 import ua.naiksoftware.stomp.StompClient
 import ua.naiksoftware.stomp.dto.LifecycleEvent
 
-class ChatWebSocketManager(private val listener: ChatListener) {
+class ChatWebSocketManager(
+    private val onMessageReceived: (ChatMessage) -> Unit
+) {
 
-    private lateinit var stompClient: StompClient
-    private var isConnected = false
-    private var subscription: Disposable? = null
+    private var stompClient: StompClient? = null
+    private val gson = Gson()
+    private val disposables = CompositeDisposable() // ✅ Add CompositeDisposable
 
-    fun connect() {
-        // Initialize STOMP client (10.0.2.2 is for Android Emulator localhost)
-        stompClient = Stomp.over(Stomp.ConnectionProvider.OKHTTP, "ws://10.0.2.2:8080/ws")
+    fun connect(url: String = "ws://10.0.2.2:8080/ws/websocket") {
+        stompClient = Stomp.over(Stomp.ConnectionProvider.OKHTTP, url)
+        stompClient?.connect()
 
-        // Handle lifecycle
-        stompClient.lifecycle().subscribe { event ->
-            when (event.type) {
+        // Subscribe to lifecycle events
+        val lifecycleDisposable: Disposable = stompClient!!.lifecycle().subscribe { lifecycleEvent ->
+            when (lifecycleEvent.type) {
                 LifecycleEvent.Type.OPENED -> {
-                    isConnected = true
-                    Log.d("WebSocket", "Connected")
-                    listener.onConnected()
+                    Log.d("ChatWebSocketManager", "Connected to STOMP ✅")
+                    subscribeToMessages()
                 }
                 LifecycleEvent.Type.ERROR -> {
-                    Log.e("WebSocket", "Error", event.exception)
-                    listener.onError(event.exception)
+                    Log.e("ChatWebSocketManager", "STOMP connection error", lifecycleEvent.exception)
                 }
                 LifecycleEvent.Type.CLOSED -> {
-                    isConnected = false
-                    Log.d("WebSocket", "Disconnected")
-                    listener.onDisconnected()
+                    Log.d("ChatWebSocketManager", "STOMP disconnected ✅")
                 }
-                else -> {}
+                LifecycleEvent.Type.FAILED_SERVER_HEARTBEAT -> {
+                    Log.e("ChatWebSocketManager", "Server heartbeat failed")
+                }
             }
         }
+        disposables.add(lifecycleDisposable)
 
-        stompClient.connect()
-
-        // Subscribe to messages
-        subscription = stompClient.topic("/topic/messages").subscribe({ stompMessage ->
-            try {
-                val json = JSONObject(stompMessage.payload)
-                val message = json.getString("content")
-                val isSent = json.getBoolean("delivered")
-                val timestamp = json.optString("timestamp")
-                listener.onMessageReceived(message, isSent, timestamp)
-            } catch (e: Exception) {
-                listener.onError(e)
-            }
-        }, { error ->
-            listener.onError(error)
-        })
+        stompClient?.connect() // actual connection
     }
 
-    fun sendMessage(message: String) {
-        if (isConnected) {
-            val payload = JSONObject()
-            payload.put("content", message)
-            payload.put("delivered", true)
+    private fun subscribeToMessages() {
+        val disposable: Disposable? = stompClient?.topic("/user/queue/messages")?.subscribe({ stompMessage ->
+            val msg = gson.fromJson(stompMessage.payload, ChatMessage::class.java)
+            onMessageReceived(msg)
+        }, { error ->
+            Log.e("ChatWebSocketManager", "Error subscribing", error)
+        })
+        disposable?.let { disposables.add(it) }
 
-            stompClient.send("/app/chat.send", payload.toString())
-                .subscribe({
-                    Log.d("WebSocket", "Message sent: $message")
-                }, { error ->
-                    listener.onError(error)
-                })
-        } else {
-            Log.w("WebSocket", "Cannot send, not connected")
-        }
+    }
+
+    fun sendMessage(message: ChatMessage) {
+        val json = gson.toJson(message)
+        val disposable: Disposable? = stompClient?.send("/app/chat.send", json)?.subscribe({
+            Log.d("ChatWebSocketManager", "Message sent ✅")
+        }, { error ->
+            Log.i("ChatWebSocketManager", "Send error", error)
+        })
+        disposable?.let { disposables.add(it) }
     }
 
     fun disconnect() {
-        subscription?.dispose()
-        stompClient.disconnect()
-    }
-
-    interface ChatListener {
-        fun onConnected()
-        fun onDisconnected()
-        fun onMessageReceived(message: String, isSent: Boolean, timestamp: String?)
-        fun onError(error: Throwable?)
+        stompClient?.disconnect()
+        disposables.clear()  // ✅ Clear all subscriptions
+        Log.d("ChatWebSocketManager", "STOMP disconnected ✅")
     }
 }
