@@ -21,8 +21,9 @@ class ChatWebSocketManager(
     /**
      * Connect to STOMP server with username for private messaging
      */
+//    url: String = "ws://10.0.2.2:8080/ws/websocket",
     fun connect(
-        url: String = "ws://10.0.2.2:8080/ws/websocket",
+        url: String = "wss://indichatbackend.onrender.com/ws/websocket",
         username: String
     ) {
         stompClient = Stomp.over(Stomp.ConnectionProvider.OKHTTP, url)

@@ -64,7 +64,7 @@ class MainActivity : AppCompatActivity() {
 
         chatWebSocketManager.connect(username = currentUserId)
         sendButton.setOnClickListener {
-            val text = editText.text.toString()
+            val text = editText.text.toString().trim()
             if (text.isNotBlank()) {
                 val now = formatTime(null)
                 val messageId = UUID.randomUUID().toString()
@@ -97,6 +97,10 @@ class MainActivity : AppCompatActivity() {
                 response.body()?.let { list ->
                     messages.addAll(list.sortedBy { it.timestamp })
                     chatAdapter.notifyDataSetChanged()
+
+                    // Scroll to last message
+                    val recyclerView = findViewById<RecyclerView>(R.id.chatRecyclerView)
+                    recyclerView.scrollToPosition(messages.size - 1)
                 }
             }
 
