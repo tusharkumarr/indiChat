@@ -18,8 +18,8 @@ class MainActivity : AppCompatActivity() {
     private val messages = mutableListOf<ChatMessage>()
     private lateinit var chatWebSocketManager: ChatWebSocketManager
 
-    private val currentUserId = "user1"
-    private val receiverId = "user2"
+    private val currentUserId = "user2"
+    private val receiverId = "user1"
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -29,41 +29,56 @@ class MainActivity : AppCompatActivity() {
         val editText = findViewById<EditText>(R.id.inputMessage)
         val sendButton = findViewById<ImageButton>(R.id.buttonSend)
 
-        chatAdapter = ChatAdapter(messages)
+        chatAdapter = ChatAdapter(messages, currentUserId) // pass current user id to adapter
         recyclerView.layoutManager = LinearLayoutManager(this)
         recyclerView.adapter = chatAdapter
 
+        // Initialize WebSocket manager
         chatWebSocketManager = ChatWebSocketManager { msg ->
             runOnUiThread {
-                messages.add(msg)
-                chatAdapter.notifyItemInserted(messages.size - 1)
-                recyclerView.scrollToPosition(messages.size - 1)
+                val index = messages.indexOfFirst { it.id == msg.id }
+                if (index != -1) {
+                    // Update message with server timestamp
+                    messages[index].timestamp = msg.timestamp
+                    messages[index].displayTime = msg.displayTime ?: msg.timestamp
+                    chatAdapter.notifyItemChanged(index)
+                } else {
+                    // New message from other user
+                    messages.add(msg)
+                    chatAdapter.notifyItemInserted(messages.size - 1)
+                    recyclerView.scrollToPosition(messages.size - 1)
+                }
             }
         }
-
 
         chatWebSocketManager.connect(username = currentUserId)
 
         sendButton.setOnClickListener {
             val text = editText.text.toString()
             if (text.isNotBlank()) {
-                // Local display time
-                val displayTime = SimpleDateFormat("HH:mm", Locale.getDefault()).format(Date())
+                val now = SimpleDateFormat("HH:mm", Locale.getDefault()).format(Date())
+                val messageId = UUID.randomUUID().toString()
 
-                // Prepare message to send (no timestamp!)
-                val msg = ChatMessage(currentUserId, receiverId, text, null, true)
+                // Create message with initial null timestamp
+                val msg = ChatMessage(
+                    id = messageId,
+                    senderId = currentUserId,
+                    receiverId = receiverId,
+                    message = text,
+                    timestamp = null, // server will set
+                    delivered = false
+                )
+                msg.displayTime = now
 
-                // Show immediately with local display time
-                msg.displayTime = displayTime  // add a new field 'displayTime' in ChatMessage for client-side use
+                // Show immediately in SENT style
                 messages.add(msg)
                 chatAdapter.notifyItemInserted(messages.size - 1)
                 recyclerView.scrollToPosition(messages.size - 1)
                 editText.text.clear()
 
-                chatWebSocketManager.sendMessage(msg) // server will set proper timestamp
+                chatWebSocketManager.sendMessage(msg)
             }
         }
-
     }
 
     override fun onDestroy() {

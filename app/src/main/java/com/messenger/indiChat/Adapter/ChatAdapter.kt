@@ -7,9 +7,13 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.messenger.indiChat.R
 import com.messenger.indiChat.models.ChatMessage
+import java.text.SimpleDateFormat
+import java.util.*
 
-class ChatAdapter(private val messages: List<ChatMessage>) :
-    RecyclerView.Adapter<ChatAdapter.ChatViewHolder>() {
+class ChatAdapter(
+    private val messages: List<ChatMessage>,
+    private val currentUserId: String // pass the current user id
+) : RecyclerView.Adapter<ChatAdapter.ChatViewHolder>() {
 
     companion object {
         private const val VIEW_TYPE_RECEIVED = 0
@@ -22,7 +26,8 @@ class ChatAdapter(private val messages: List<ChatMessage>) :
     }
 
     override fun getItemViewType(position: Int): Int {
-        return if (messages[position].delivered) VIEW_TYPE_SENT else VIEW_TYPE_RECEIVED
+        return if (messages[position].senderId == currentUserId) VIEW_TYPE_SENT
+        else VIEW_TYPE_RECEIVED
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ChatViewHolder {
@@ -38,7 +43,20 @@ class ChatAdapter(private val messages: List<ChatMessage>) :
     override fun onBindViewHolder(holder: ChatViewHolder, position: Int) {
         val msg = messages[position]
         holder.messageText.text = msg.message
-        holder.timeText.text = msg.displayTime
+
+        // Format timestamp if available, else use client displayTime
+        val timeToShow = msg.timestamp?.let { serverTimestamp ->
+            try {
+                val parser = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.getDefault()) // assuming server sends ISO format
+                val date = parser.parse(serverTimestamp)
+                val formatter = SimpleDateFormat("HH:mm", Locale.getDefault())
+                formatter.format(date ?: Date())
+            } catch (e: Exception) {
+                msg.displayTime ?: ""
+            }
+        } ?: msg.displayTime ?: ""
+
+        holder.timeText.text = timeToShow
     }
 
     override fun getItemCount() = messages.size
