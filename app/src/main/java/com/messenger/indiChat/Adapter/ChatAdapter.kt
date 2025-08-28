@@ -37,7 +37,7 @@ class ChatAdapter(private val messages: List<ChatMessage>) :
 
     override fun onBindViewHolder(holder: ChatViewHolder, position: Int) {
         val msg = messages[position]
-        holder.messageText.text = msg.content
+        holder.messageText.text = msg.message
         holder.timeText.text = msg.displayTime
     }
 

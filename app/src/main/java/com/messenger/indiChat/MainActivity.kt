@@ -35,13 +35,14 @@ class MainActivity : AppCompatActivity() {
 
         chatWebSocketManager = ChatWebSocketManager { msg ->
             runOnUiThread {
-                messages.add(msg.copy(delivered = false))
+                messages.add(msg)
                 chatAdapter.notifyItemInserted(messages.size - 1)
                 recyclerView.scrollToPosition(messages.size - 1)
             }
         }
 
-        chatWebSocketManager.connect()
+
+        chatWebSocketManager.connect(username = currentUserId)
 
         sendButton.setOnClickListener {
             val text = editText.text.toString()
