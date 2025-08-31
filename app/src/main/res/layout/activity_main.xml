@@ -1,79 +1,28 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical">
+    android:background="#075E54">
 
+    <!-- App Logo in the center -->
+    <ImageView
+        android:id="@+id/logo"
+        android:layout_width="120dp"
+        android:layout_height="120dp"
+        android:src="@mipmap/ic_launcher"
+        android:layout_centerInParent="true"
+        android:contentDescription="App Logo" />
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="56dp"
-        android:background="#075E54"
-        android:orientation="horizontal"
-        android:gravity="center_vertical"
-        android:paddingStart="16dp"
-        android:paddingEnd="16dp">
-
-        <ImageButton
-            android:id="@+id/displayPicture"
-            android:layout_width="60dp"
-            android:layout_height="40dp"
-            android:background="?attr/selectableItemBackgroundBorderless"
-            android:src="@drawable/ic_person"
-            android:contentDescription="Back"
-            app:tint="#FFFFFF" />
-
-        <TextView
-            android:id="@+id/chatTitle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Name"
-            android:textColor="#FFFFFF"
-            android:textSize="20sp"
-            android:layout_marginStart="16dp"
-            android:textStyle="bold" />
-
-    </LinearLayout>
-
-    <!-- RecyclerView for chat messages -->
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/chatRecyclerView"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
-        android:padding="8dp" />
-
-    <!-- Input area styled like WhatsApp -->
-    <LinearLayout
-        android:layout_width="match_parent"
+    <!-- App name below logo -->
+    <TextView
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:padding="8dp"
-        android:background="#FFFFFF"
-        android:gravity="center_vertical">
+        android:text="Welcome to IndiChat"
+        android:textColor="#FFFFFF"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        android:layout_below="@id/logo"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="16dp" />
 
-        <EditText
-            android:id="@+id/inputMessage"
-            android:layout_width="0dp"
-            android:layout_height="48dp"
-            android:layout_weight="1"
-            android:hint="Type Here"
-            android:background="@drawable/edittext_bg"
-            android:paddingHorizontal="16dp"
-            android:paddingVertical="10dp"
-            android:textSize="16sp"
-            android:inputType="textCapSentences|textMultiLine"
-            android:maxLines="4" />
-
-        <ImageButton
-            android:id="@+id/buttonSend"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
-            android:layout_marginStart="8dp"
-            android:background="?attr/selectableItemBackgroundBorderless"
-            android:src="@android:drawable/ic_menu_send"
-            android:contentDescription="Send"
-            app:tint="#128C7E" />
-    </LinearLayout>
-</LinearLayout>
+</RelativeLayout>
