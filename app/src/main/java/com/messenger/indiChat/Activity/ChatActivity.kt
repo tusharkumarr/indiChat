@@ -19,24 +19,35 @@ import retrofit2.Response
 import java.text.SimpleDateFormat
 import java.util.*
 
-class ChatActivity: AppCompatActivity() {
+class ChatActivity : AppCompatActivity() {
 
     private lateinit var chatAdapter: ChatAdapter
     private val messages = mutableListOf<ChatMessage>()
     private lateinit var chatWebSocketManager: ChatWebSocketManager
 
-    private val currentUserId = "user2"
-    private val receiverId = "user1"
+    private lateinit var currentUserId: String
+    private lateinit var receiverId: String
+    private lateinit var receiverName: String
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_chat)
 
+        // ✅ Get values from previous activity
+        currentUserId = intent.getStringExtra("currentUserId") ?: ""
+        receiverId = intent.getStringExtra("userId") ?: ""
+        receiverName = intent.getStringExtra("userName") ?: ""
+
+//        Toast.makeText(this, receiverName, Toast.LENGTH_SHORT).show();
+
+
         val recyclerView = findViewById<RecyclerView>(R.id.chatRecyclerView)
         val editText = findViewById<EditText>(R.id.inputMessage)
         val sendButton = findViewById<ImageButton>(R.id.buttonSend)
         val chatTitle = findViewById<TextView>(R.id.chatTitle)
-        chatTitle.text = receiverId
+
+        // Show the receiver's name in chat title
+        chatTitle.text = receiverName
 
         chatAdapter = ChatAdapter(messages, currentUserId)
         recyclerView.layoutManager = LinearLayoutManager(this)
@@ -50,12 +61,12 @@ class ChatActivity: AppCompatActivity() {
             runOnUiThread {
                 val index = messages.indexOfFirst { it.id == msg.id }
                 if (index != -1) {
-                    // Update message with server timestamp
+                    // Update existing message
                     messages[index].timestamp = msg.timestamp
                     messages[index].displayTime = msg.displayTime ?: formatTime(msg.timestamp)
                     chatAdapter.notifyItemChanged(index)
                 } else {
-                    // New message from other user
+                    // Add new message
                     messages.add(msg)
                     chatAdapter.notifyItemInserted(messages.size - 1)
                     recyclerView.scrollToPosition(messages.size - 1)
@@ -64,13 +75,13 @@ class ChatActivity: AppCompatActivity() {
         }
 
         chatWebSocketManager.connect(username = currentUserId)
+
         sendButton.setOnClickListener {
             val text = editText.text.toString().trim()
             if (text.isNotBlank()) {
                 val now = formatTime(null)
                 val messageId = UUID.randomUUID().toString()
 
-                // Create message with initial null timestamp
                 val msg = ChatMessage(
                     id = messageId,
                     senderId = currentUserId,
@@ -81,7 +92,7 @@ class ChatActivity: AppCompatActivity() {
                 )
                 msg.displayTime = now
 
-                // Show immediately in SENT style
+                // Show immediately
                 messages.add(msg)
                 chatAdapter.notifyItemInserted(messages.size - 1)
                 recyclerView.scrollToPosition(messages.size - 1)
@@ -91,6 +102,7 @@ class ChatActivity: AppCompatActivity() {
             }
         }
     }
+
     private fun fetchPreviousMessages() {
         val api = RetrofitClient.getInstance().create(ChatApi::class.java)
         api.getMessages(currentUserId, receiverId).enqueue(object : Callback<List<ChatMessage>> {
@@ -99,7 +111,6 @@ class ChatActivity: AppCompatActivity() {
                     messages.addAll(list.sortedBy { it.timestamp })
                     chatAdapter.notifyDataSetChanged()
 
-                    // Scroll to last message
                     val recyclerView = findViewById<RecyclerView>(R.id.chatRecyclerView)
                     recyclerView.scrollToPosition(messages.size - 1)
                 }

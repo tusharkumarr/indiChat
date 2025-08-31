@@ -16,6 +16,9 @@ class HomeActivity : AppCompatActivity() {
     private lateinit var userAdapter: UserAdapter
     private val userList = mutableListOf<User>()
 
+    // TODO: Replace this with actual logged-in user ID from Session/Auth
+    private val currentUserId = "user2"
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_home)
@@ -24,14 +27,15 @@ class HomeActivity : AppCompatActivity() {
         recyclerUsers.layoutManager = LinearLayoutManager(this)
 
         // Dummy data (replace with actual DB / API later)
-        userList.add(User("1", "Alice", "Hey, how are you?", "10:30"))
-        userList.add(User("2", "Bob", "See you soon", "11:15"))
-        userList.add(User("3", "Charlie", "Okay thanks!", "12:45"))
+        userList.add(User("1", "Deepti", "Hey, how are you?", "10:30"))
+        userList.add(User("2", "Tushar", "See you soon", "11:15"))
+        userList.add(User("3", "ABC", "Okay thanks!", "12:45"))
 
         userAdapter = UserAdapter(userList) { selectedUser ->
             val intent = Intent(this, ChatActivity::class.java)
-            intent.putExtra("userId", selectedUser.id)
-            intent.putExtra("userName", selectedUser.name)
+            intent.putExtra("userId", selectedUser.id)       // Receiver ID
+            intent.putExtra("userName", selectedUser.name)   // Receiver Name
+            intent.putExtra("currentUserId", currentUserId)  // Logged-in user
             startActivity(intent)
         }
 
