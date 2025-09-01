@@ -9,7 +9,6 @@ import androidx.lifecycle.lifecycleScope
 import com.messenger.indiChat.R
 import com.messenger.indiChat.models.LoginRequest
 import com.messenger.indiChat.models.LoginResponse
-import com.messenger.indiChat.network.AuthApi
 import com.messenger.indiChat.network.RetrofitClient
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -31,17 +30,15 @@ class LoginActivity : AppCompatActivity() {
         editPassword = findViewById(R.id.editPassword)
         btnLogin = findViewById(R.id.btnLogin)
         btnRegister = findViewById(R.id.btnRegister)
-        progressBar = findViewById(R.id.progressBar) // Add a ProgressBar in your layout
+        progressBar = findViewById(R.id.progressBar)
 
         btnLogin.setOnClickListener {
             val userId = editUserId.text.toString().trim()
             val password = editPassword.text.toString().trim()
-
             if (userId.isEmpty() || password.isEmpty()) {
                 Toast.makeText(this, "Please enter all fields", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
-
             loginUser(userId, password)
         }
 
@@ -57,7 +54,8 @@ class LoginActivity : AppCompatActivity() {
         lifecycleScope.launch {
             try {
                 val response: LoginResponse = withContext(Dispatchers.IO) {
-                    RetrofitClient.authApi.login(LoginRequest(userId, password))
+                    RetrofitClient.authApi(this@LoginActivity)
+                        .login(LoginRequest(userId, password))
                 }
 
                 progressBar.visibility = View.GONE
@@ -68,11 +66,10 @@ class LoginActivity : AppCompatActivity() {
                     with(sharedPref.edit()) {
                         putBoolean("isLoggedIn", true)
                         putString("userId", userId)
-                        putString("token", response.token)
+                        putString("jwtToken", response.token) // ✅ must match Retrofit interceptor
                         apply()
                     }
 
-                    Toast.makeText(this@LoginActivity, "Login Successful", Toast.LENGTH_SHORT).show()
                     startActivity(Intent(this@LoginActivity, HomeActivity::class.java))
                     finish()
                 } else {
@@ -82,7 +79,11 @@ class LoginActivity : AppCompatActivity() {
                 e.printStackTrace()
                 progressBar.visibility = View.GONE
                 btnLogin.isEnabled = true
-                Toast.makeText(this@LoginActivity, "Login failed: ${e.localizedMessage}", Toast.LENGTH_SHORT).show()
+                Toast.makeText(
+                    this@LoginActivity,
+                    "Login failed: ${e.localizedMessage}",
+                    Toast.LENGTH_SHORT
+                ).show()
             }
         }
     }

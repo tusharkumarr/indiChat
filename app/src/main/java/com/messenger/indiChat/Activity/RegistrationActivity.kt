@@ -94,7 +94,7 @@ class RegistrationActivity : AppCompatActivity() {
         lifecycleScope.launch {
             try {
                 val request = SignupRequest(name, mobile, password, dob)
-                val response = RetrofitClient.authApi.signup(request)
+                val response = RetrofitClient.authApi(this@RegistrationActivity).signup(request)
 
                 Toast.makeText(this@RegistrationActivity, response.message, Toast.LENGTH_SHORT).show()
 

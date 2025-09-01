@@ -3,53 +3,72 @@ package com.messenger.indiChat.Activity
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.view.View
+import android.widget.ProgressBar
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.messenger.indiChat.Adapter.UserAdapter
 import com.messenger.indiChat.R
 import com.messenger.indiChat.models.User
+import com.messenger.indiChat.network.RetrofitClient
 import com.messenger.indiChat.ChatActivity
+import kotlinx.coroutines.launch
 
 class HomeActivity : AppCompatActivity() {
 
     private lateinit var recyclerUsers: RecyclerView
     private lateinit var userAdapter: UserAdapter
     private val userList = mutableListOf<User>()
+    private lateinit var progressBar: ProgressBar
 
-    private var currentUserId: String? = null
+    private lateinit var currentUserId: String
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_home)
 
-        // Get current user ID from SharedPreferences
         val sharedPref = getSharedPreferences("MyAppPrefs", Context.MODE_PRIVATE)
-        currentUserId = sharedPref.getString("userId", null)
+        val token = sharedPref.getString("jwtToken", null)
+        currentUserId = sharedPref.getString("userId", "") ?: ""
 
-        if (currentUserId == null) {
-            // User not logged in, redirect to LoginActivity
+        if (token.isNullOrEmpty() || currentUserId.isEmpty()) {
             startActivity(Intent(this, LoginActivity::class.java))
             finish()
             return
         }
 
         recyclerUsers = findViewById(R.id.recyclerUsers)
+        progressBar = findViewById(R.id.progressBar)
         recyclerUsers.layoutManager = LinearLayoutManager(this)
-
-        // Dummy data (replace with actual DB / API later)
-        userList.add(User("1", "Deepti", "Hey, how are you?", "10:30"))
-        userList.add(User("2", "Tushar", "See you soon", "11:15"))
-        userList.add(User("3", "ABC", "Okay thanks!", "12:45"))
 
         userAdapter = UserAdapter(userList) { selectedUser ->
             val intent = Intent(this, ChatActivity::class.java)
-            intent.putExtra("userId", selectedUser.id)       // Receiver ID
-            intent.putExtra("userName", selectedUser.name)   // Receiver Name
-            intent.putExtra("currentUserId", currentUserId)  // Logged-in user
+            intent.putExtra("userId", selectedUser.id)
+            intent.putExtra("userName", selectedUser.name)
             startActivity(intent)
         }
 
         recyclerUsers.adapter = userAdapter
+        fetchChatUsers()
+    }
+
+    private fun fetchChatUsers() {
+        progressBar.visibility = View.VISIBLE
+        lifecycleScope.launch {
+            try {
+                val users = RetrofitClient.chatApi(this@HomeActivity).getChatUsers()
+                userList.clear()
+                userList.addAll(users)
+                userAdapter.notifyDataSetChanged()
+            } catch (e: Exception) {
+                e.printStackTrace()
+                Toast.makeText(this@HomeActivity, "Failed to load users", Toast.LENGTH_SHORT).show()
+            } finally {
+                progressBar.visibility = View.GONE
+            }
+        }
     }
 }
