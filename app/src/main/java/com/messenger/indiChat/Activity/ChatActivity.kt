@@ -33,20 +33,16 @@ class ChatActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_chat)
 
-        // ✅ Get values from previous activity
+        // Get values from previous activity
         currentUserId = intent.getStringExtra("currentUserId") ?: ""
         receiverId = intent.getStringExtra("userId") ?: ""
         receiverName = intent.getStringExtra("userName") ?: ""
-
-//        Toast.makeText(this, receiverName, Toast.LENGTH_SHORT).show();
-
 
         val recyclerView = findViewById<RecyclerView>(R.id.chatRecyclerView)
         val editText = findViewById<EditText>(R.id.inputMessage)
         val sendButton = findViewById<ImageButton>(R.id.buttonSend)
         val chatTitle = findViewById<TextView>(R.id.chatTitle)
 
-        // Show the receiver's name in chat title
         chatTitle.text = receiverName
 
         chatAdapter = ChatAdapter(messages, currentUserId)
@@ -61,12 +57,10 @@ class ChatActivity : AppCompatActivity() {
             runOnUiThread {
                 val index = messages.indexOfFirst { it.id == msg.id }
                 if (index != -1) {
-                    // Update existing message
                     messages[index].timestamp = msg.timestamp
                     messages[index].displayTime = msg.displayTime ?: formatTime(msg.timestamp)
                     chatAdapter.notifyItemChanged(index)
                 } else {
-                    // Add new message
                     messages.add(msg)
                     chatAdapter.notifyItemInserted(messages.size - 1)
                     recyclerView.scrollToPosition(messages.size - 1)
@@ -104,22 +98,26 @@ class ChatActivity : AppCompatActivity() {
     }
 
     private fun fetchPreviousMessages() {
-        val api = RetrofitClient.getInstance().create(ChatApi::class.java)
-        api.getMessages(currentUserId, receiverId).enqueue(object : Callback<List<ChatMessage>> {
-            override fun onResponse(call: Call<List<ChatMessage>>, response: Response<List<ChatMessage>>) {
-                response.body()?.let { list ->
-                    messages.addAll(list.sortedBy { it.timestamp })
-                    chatAdapter.notifyDataSetChanged()
-
-                    val recyclerView = findViewById<RecyclerView>(R.id.chatRecyclerView)
-                    recyclerView.scrollToPosition(messages.size - 1)
+        val api: ChatApi = RetrofitClient.chatApi // <-- updated here
+        api.getMessages(currentUserId, receiverId)
+            .enqueue(object : Callback<List<ChatMessage>> {
+                override fun onResponse(
+                    call: Call<List<ChatMessage>>,
+                    response: Response<List<ChatMessage>>
+                ) {
+                    response.body()?.let { list ->
+                        messages.addAll(list.sortedBy { it.timestamp })
+                        chatAdapter.notifyDataSetChanged()
+                        val recyclerView = findViewById<RecyclerView>(R.id.chatRecyclerView)
+                        recyclerView.scrollToPosition(messages.size - 1)
+                    }
                 }
-            }
 
-            override fun onFailure(call: Call<List<ChatMessage>>, t: Throwable) {
-                t.printStackTrace()
-            }
-        })
+                override fun onFailure(call: Call<List<ChatMessage>>, t: Throwable) {
+                    t.printStackTrace()
+                    Toast.makeText(this@ChatActivity, "Failed to fetch messages", Toast.LENGTH_SHORT).show()
+                }
+            })
     }
 
     private fun formatTime(timestamp: String?): String {

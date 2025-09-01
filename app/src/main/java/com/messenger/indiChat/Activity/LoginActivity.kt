@@ -2,11 +2,18 @@ package com.messenger.indiChat.Activity
 
 import android.content.Intent
 import android.os.Bundle
-import android.widget.Button
-import android.widget.EditText
-import android.widget.Toast
+import android.view.View
+import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.lifecycleScope
 import com.messenger.indiChat.R
+import com.messenger.indiChat.models.LoginRequest
+import com.messenger.indiChat.models.LoginResponse
+import com.messenger.indiChat.network.AuthApi
+import com.messenger.indiChat.network.RetrofitClient
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class LoginActivity : AppCompatActivity() {
 
@@ -14,6 +21,7 @@ class LoginActivity : AppCompatActivity() {
     private lateinit var editPassword: EditText
     private lateinit var btnLogin: Button
     private lateinit var btnRegister: Button
+    private lateinit var progressBar: ProgressBar
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -23,6 +31,7 @@ class LoginActivity : AppCompatActivity() {
         editPassword = findViewById(R.id.editPassword)
         btnLogin = findViewById(R.id.btnLogin)
         btnRegister = findViewById(R.id.btnRegister)
+        progressBar = findViewById(R.id.progressBar) // Add a ProgressBar in your layout
 
         btnLogin.setOnClickListener {
             val userId = editUserId.text.toString().trim()
@@ -33,25 +42,48 @@ class LoginActivity : AppCompatActivity() {
                 return@setOnClickListener
             }
 
-            // TODO: Replace this with real backend login verification
-            if (password == "123456") { // dummy password check
-                val sharedPref = getSharedPreferences("MyAppPrefs", MODE_PRIVATE)
-                with(sharedPref.edit()) {
-                    putBoolean("isLoggedIn", true)
-                    putString("userId", userId)
-                    apply()
-                }
-
-                Toast.makeText(this, "Login Successful", Toast.LENGTH_SHORT).show()
-                startActivity(Intent(this, HomeActivity::class.java))
-                finish()
-            } else {
-                Toast.makeText(this, "Invalid credentials", Toast.LENGTH_SHORT).show()
-            }
+            loginUser(userId, password)
         }
 
         btnRegister.setOnClickListener {
             startActivity(Intent(this, RegistrationActivity::class.java))
+        }
+    }
+
+    private fun loginUser(userId: String, password: String) {
+        progressBar.visibility = View.VISIBLE
+        btnLogin.isEnabled = false
+
+        lifecycleScope.launch {
+            try {
+                val response: LoginResponse = withContext(Dispatchers.IO) {
+                    RetrofitClient.authApi.login(LoginRequest(userId, password))
+                }
+
+                progressBar.visibility = View.GONE
+                btnLogin.isEnabled = true
+
+                if (response.success) {
+                    val sharedPref = getSharedPreferences("MyAppPrefs", MODE_PRIVATE)
+                    with(sharedPref.edit()) {
+                        putBoolean("isLoggedIn", true)
+                        putString("userId", userId)
+                        putString("token", response.token)
+                        apply()
+                    }
+
+                    Toast.makeText(this@LoginActivity, "Login Successful", Toast.LENGTH_SHORT).show()
+                    startActivity(Intent(this@LoginActivity, HomeActivity::class.java))
+                    finish()
+                } else {
+                    Toast.makeText(this@LoginActivity, response.message, Toast.LENGTH_SHORT).show()
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
+                progressBar.visibility = View.GONE
+                btnLogin.isEnabled = true
+                Toast.makeText(this@LoginActivity, "Login failed: ${e.localizedMessage}", Toast.LENGTH_SHORT).show()
+            }
         }
     }
 }

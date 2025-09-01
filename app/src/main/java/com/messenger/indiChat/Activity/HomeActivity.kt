@@ -1,5 +1,6 @@
 package com.messenger.indiChat.Activity
 
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
@@ -16,12 +17,22 @@ class HomeActivity : AppCompatActivity() {
     private lateinit var userAdapter: UserAdapter
     private val userList = mutableListOf<User>()
 
-    // TODO: Replace this with actual logged-in user ID from Session/Auth
-    private val currentUserId = "user2"
+    private var currentUserId: String? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_home)
+
+        // Get current user ID from SharedPreferences
+        val sharedPref = getSharedPreferences("MyAppPrefs", Context.MODE_PRIVATE)
+        currentUserId = sharedPref.getString("userId", null)
+
+        if (currentUserId == null) {
+            // User not logged in, redirect to LoginActivity
+            startActivity(Intent(this, LoginActivity::class.java))
+            finish()
+            return
+        }
 
         recyclerUsers = findViewById(R.id.recyclerUsers)
         recyclerUsers.layoutManager = LinearLayoutManager(this)
