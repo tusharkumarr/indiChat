@@ -1,11 +1,15 @@
 package com.messenger.indiChat.Activity
 
 import android.app.DatePickerDialog
-import android.content.Intent
 import android.os.Bundle
+import android.view.View
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.lifecycleScope
 import com.messenger.indiChat.R
+import com.messenger.indiChat.models.SignupRequest
+import com.messenger.indiChat.network.RetrofitClient
+import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -17,17 +21,20 @@ class RegistrationActivity : AppCompatActivity() {
     private lateinit var editConfirmPassword: EditText
     private lateinit var editDob: EditText
     private lateinit var btnRegister: Button
+    private lateinit var progressBar: ProgressBar
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_registration)
 
+        // Initialize views
         editName = findViewById(R.id.editName)
         editMobile = findViewById(R.id.editMobile)
         editPassword = findViewById(R.id.editPassword)
         editConfirmPassword = findViewById(R.id.editConfirmPassword)
         editDob = findViewById(R.id.editDob)
         btnRegister = findViewById(R.id.btnRegister)
+        progressBar = findViewById(R.id.progressBar)
 
         // Handle DOB picker
         editDob.setOnClickListener { showDatePicker() }
@@ -39,7 +46,10 @@ class RegistrationActivity : AppCompatActivity() {
             val confirmPassword = editConfirmPassword.text.toString().trim()
             val dob = editDob.text.toString().trim()
 
-            if (name.isEmpty() || mobile.isEmpty() || password.isEmpty() || confirmPassword.isEmpty() || dob.isEmpty()) {
+            // Validations
+            if (name.isEmpty() || mobile.isEmpty() || password.isEmpty() ||
+                confirmPassword.isEmpty() || dob.isEmpty()
+            ) {
                 Toast.makeText(this, "Please fill all fields", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
@@ -54,15 +64,8 @@ class RegistrationActivity : AppCompatActivity() {
                 return@setOnClickListener
             }
 
-            // TODO: Send OTP to mobile here
-            Toast.makeText(this, "OTP sent to $mobile", Toast.LENGTH_SHORT).show()
-
-            val intent = Intent(this, OtpVerificationActivity::class.java)
-            intent.putExtra("mobileNumber", mobile)
-            intent.putExtra("name", name)
-            intent.putExtra("dob", dob)
-            intent.putExtra("password", password)
-            startActivity(intent)
+            // Call signup API
+            signupUser(name, mobile, password, dob)
         }
     }
 
@@ -82,5 +85,29 @@ class RegistrationActivity : AppCompatActivity() {
         )
         datePicker.datePicker.maxDate = System.currentTimeMillis() // prevent future DOB
         datePicker.show()
+    }
+
+    private fun signupUser(name: String, mobile: String, password: String, dob: String) {
+        progressBar.visibility = View.VISIBLE
+        btnRegister.isEnabled = false
+
+        lifecycleScope.launch {
+            try {
+                val request = SignupRequest(name, mobile, password, dob)
+                val response = RetrofitClient.authApi.signup(request)
+
+                Toast.makeText(this@RegistrationActivity, response.message, Toast.LENGTH_SHORT).show()
+
+                if (response.success) {
+                    finish() // Close registration and go back to login
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
+                Toast.makeText(this@RegistrationActivity, "Signup failed. Try again.", Toast.LENGTH_SHORT).show()
+            } finally {
+                progressBar.visibility = View.GONE
+                btnRegister.isEnabled = true
+            }
+        }
     }
 }

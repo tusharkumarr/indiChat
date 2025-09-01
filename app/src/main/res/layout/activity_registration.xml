@@ -4,74 +4,90 @@
     android:layout_height="match_parent"
     android:padding="24dp">
 
-    <LinearLayout
+    <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:gravity="center_horizontal">
+        android:layout_height="wrap_content">
 
-        <!-- Name -->
-        <EditText
-            android:id="@+id/editName"
+        <LinearLayout
+            android:id="@+id/formLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Enter Name"
-            android:inputType="textPersonName"
-            android:padding="12dp"
-            android:background="@android:drawable/edit_text" />
+            android:orientation="vertical"
+            android:gravity="center_horizontal">
 
-        <!-- Mobile Number -->
-        <EditText
-            android:id="@+id/editMobile"
-            android:layout_width="match_parent"
+            <!-- Name -->
+            <EditText
+                android:id="@+id/editName"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Enter Name"
+                android:inputType="textPersonName"
+                android:padding="12dp"
+                android:background="@android:drawable/edit_text" />
+
+            <!-- Mobile Number -->
+            <EditText
+                android:id="@+id/editMobile"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Mobile Number"
+                android:inputType="phone"
+                android:padding="12dp"
+                android:background="@android:drawable/edit_text"
+                android:layout_marginTop="12dp" />
+
+            <!-- Password -->
+            <EditText
+                android:id="@+id/editPassword"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Password"
+                android:inputType="textPassword"
+                android:padding="12dp"
+                android:background="@android:drawable/edit_text"
+                android:layout_marginTop="12dp" />
+
+            <!-- Confirm Password -->
+            <EditText
+                android:id="@+id/editConfirmPassword"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Confirm Password"
+                android:inputType="textPassword"
+                android:padding="12dp"
+                android:background="@android:drawable/edit_text"
+                android:layout_marginTop="12dp" />
+
+            <!-- DOB -->
+            <EditText
+                android:id="@+id/editDob"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Date of Birth"
+                android:focusable="false"
+                android:clickable="true"
+                android:padding="12dp"
+                android:background="@android:drawable/edit_text"
+                android:layout_marginTop="12dp" />
+
+            <!-- Register Button -->
+            <Button
+                android:id="@+id/btnRegister"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Register"
+                android:layout_marginTop="16dp" />
+
+        </LinearLayout>
+
+        <!-- Progress Bar centered over the form -->
+        <ProgressBar
+            android:id="@+id/progressBar"
+            style="?android:attr/progressBarStyleLarge"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:hint="Mobile Number"
-            android:inputType="phone"
-            android:padding="12dp"
-            android:background="@android:drawable/edit_text"
-            android:layout_marginTop="12dp" />
+            android:layout_centerInParent="true"
+            android:visibility="gone" />
 
-        <!-- Password -->
-        <EditText
-            android:id="@+id/editPassword"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="Password"
-            android:inputType="textPassword"
-            android:padding="12dp"
-            android:background="@android:drawable/edit_text"
-            android:layout_marginTop="12dp" />
-
-        <!-- Confirm Password -->
-        <EditText
-            android:id="@+id/editConfirmPassword"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="Confirm Password"
-            android:inputType="textPassword"
-            android:padding="12dp"
-            android:background="@android:drawable/edit_text"
-            android:layout_marginTop="12dp" />
-
-        <!-- DOB -->
-        <EditText
-            android:id="@+id/editDob"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="Date of Birth"
-            android:focusable="false"
-            android:clickable="true"
-            android:padding="12dp"
-            android:background="@android:drawable/edit_text"
-            android:layout_marginTop="12dp" />
-
-        <!-- Register Button -->
-        <Button
-            android:id="@+id/btnRegister"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Register"
-            android:layout_marginTop="16dp" />
-
-    </LinearLayout>
+    </RelativeLayout>
 </ScrollView>
