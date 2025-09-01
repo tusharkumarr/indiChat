@@ -1,6 +1,5 @@
 package com.messenger.indiChat.network
 
-import android.content.Context
 import android.util.Log
 import com.google.gson.Gson
 import com.messenger.indiChat.models.ChatMessage
@@ -9,8 +8,10 @@ import io.reactivex.disposables.CompositeDisposable
 import ua.naiksoftware.stomp.Stomp
 import ua.naiksoftware.stomp.StompClient
 import ua.naiksoftware.stomp.dto.LifecycleEvent
+import ua.naiksoftware.stomp.dto.StompHeader
 
 class ChatWebSocketManager(
+    private val username: String,                  // current user
     private val onMessageReceived: (ChatMessage) -> Unit
 ) {
     private var stompClient: StompClient? = null
@@ -22,7 +23,12 @@ class ChatWebSocketManager(
     fun connect() {
         val url = ConstantValues.WEBSOCKET_URL
         stompClient = Stomp.over(Stomp.ConnectionProvider.OKHTTP, url)
-        stompClient?.connect()
+
+        // Prepare headers correctly
+        val headers = mutableListOf<StompHeader>()
+        headers.add(StompHeader("username", username))
+
+        stompClient?.connect(headers) // Pass list of StompHeader
 
         stompClient?.lifecycle()?.subscribe { event ->
             when (event.type) {
@@ -36,6 +42,7 @@ class ChatWebSocketManager(
             }
         }?.let { disposables.add(it) }
     }
+
 
     private fun subscribeToMessages() {
         stompClient?.topic("/user/queue/messages")?.subscribe({ stompMessage ->
@@ -52,6 +59,7 @@ class ChatWebSocketManager(
 
     fun sendMessage(message: ChatMessage) {
         val json = gson.toJson(message)
+        // Server will route based on receiverId inside message
         stompClient?.send("/app/chat.send", json)?.subscribe({
             Log.d(TAG, "Message sent ✅")
         }, { error ->

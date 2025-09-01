@@ -52,7 +52,7 @@ class ChatActivity : AppCompatActivity() {
 
         fetchPreviousMessages()
 
-        chatWebSocketManager = ChatWebSocketManager { msg ->
+        chatWebSocketManager = ChatWebSocketManager(currentUserId) { msg ->
             runOnUiThread {
                 val index = messages.indexOfFirst { it.id == msg.id }
                 if (index != -1) {
