@@ -15,6 +15,7 @@ import com.messenger.indiChat.R
 import com.messenger.indiChat.models.User
 import com.messenger.indiChat.network.RetrofitClient
 import com.messenger.indiChat.ChatActivity
+import com.google.android.material.floatingactionbutton.FloatingActionButton
 import kotlinx.coroutines.launch
 
 class HomeActivity : AppCompatActivity() {
@@ -23,6 +24,7 @@ class HomeActivity : AppCompatActivity() {
     private lateinit var userAdapter: UserAdapter
     private val userList = mutableListOf<User>()
     private lateinit var progressBar: ProgressBar
+    private lateinit var fabNewChat: FloatingActionButton
 
     private lateinit var currentUserId: String
 
@@ -42,6 +44,8 @@ class HomeActivity : AppCompatActivity() {
 
         recyclerUsers = findViewById(R.id.recyclerUsers)
         progressBar = findViewById(R.id.progressBar)
+        fabNewChat = findViewById(R.id.fabNewChat)
+
         recyclerUsers.layoutManager = LinearLayoutManager(this)
 
         userAdapter = UserAdapter(userList) { selectedUser ->
@@ -50,8 +54,17 @@ class HomeActivity : AppCompatActivity() {
             intent.putExtra("userName", selectedUser.name)
             startActivity(intent)
         }
-
         recyclerUsers.adapter = userAdapter
+
+        // Floating Action Button opens AddChatActivity
+        fabNewChat.setOnClickListener {
+            startActivity(Intent(this, AddChatActivity::class.java))
+        }
+    }
+
+    // 🔹 Refresh users list every time activity comes to foreground
+    override fun onResume() {
+        super.onResume()
         fetchChatUsers()
     }
 

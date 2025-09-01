@@ -43,5 +43,16 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:visibility="gone"/>
+
+        <!-- Floating Action Button for New Chat -->
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/fabNewChat"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom|end"
+            android:layout_margin="16dp"
+            android:contentDescription="Start New Chat"
+            android:src="@drawable/ic_chat"/>
+
     </FrameLayout>
 </LinearLayout>
