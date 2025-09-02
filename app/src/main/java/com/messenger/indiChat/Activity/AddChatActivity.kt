@@ -29,6 +29,17 @@ class AddChatActivity : AppCompatActivity() {
         recyclerNewUsers = findViewById(R.id.recyclerNewUsers)
         searchNewUser = findViewById(R.id.searchNewUser)
 
+        searchNewUser.setIconifiedByDefault(false)
+        searchNewUser.isIconified = false
+        searchNewUser.clearFocus()
+
+        searchNewUser.setOnQueryTextFocusChangeListener { v, hasFocus ->
+            if (hasFocus) {
+                searchNewUser.isIconified = false
+            }
+        }
+
+
         recyclerNewUsers.layoutManager = LinearLayoutManager(this)
         userAdapter = UserAdapter(userList) { user ->
             // Open ChatActivity with selected user
