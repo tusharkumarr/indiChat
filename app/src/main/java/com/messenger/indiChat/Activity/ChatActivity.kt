@@ -43,8 +43,14 @@ class ChatActivity : AppCompatActivity() {
         val editText = findViewById<EditText>(R.id.inputMessage)
         val sendButton = findViewById<ImageButton>(R.id.buttonSend)
         val chatTitle = findViewById<TextView>(R.id.chatTitle)
+        val backButton = findViewById<ImageButton>(R.id.backButton)
 
         chatTitle.text = receiverName
+
+        // ✅ Back button functionality
+        backButton.setOnClickListener {
+            finish() // closes ChatActivity and returns to previous screen
+        }
 
         chatAdapter = ChatAdapter(messages, currentUserId)
         recyclerView.layoutManager = LinearLayoutManager(this)
