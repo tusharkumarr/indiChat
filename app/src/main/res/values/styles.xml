@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="Toolbar.TitleStyle" parent="TextAppearance.Material3.TitleLarge">
+        <item name="android:textStyle">bold</item>
+<!--        <item name="android:fontFamily">@font/montserrat</item> &lt;!&ndash; 👈 custom font &ndash;&gt;-->
+        <item name="android:textSize">22sp</item> <!-- adjust as needed -->
+        <item name="android:textColor">@color/purple_500</item>
+    </style>
+
+</resources>

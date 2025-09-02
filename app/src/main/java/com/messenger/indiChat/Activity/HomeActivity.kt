@@ -37,5 +37,13 @@ class HomeActivity : AppCompatActivity() {
                 1 -> tab.text = "Reels"
             }
         }.attach()
+
+        // 🎨 Customize tab colors programmatically
+        tabLayout.setSelectedTabIndicatorColor(getColor(R.color.purple_500)) // indicator
+        tabLayout.setTabTextColors(
+            getColor(R.color.gray), // unselected text
+            getColor(R.color.white) // selected text
+        )
+        tabLayout.setBackgroundColor(getColor(R.color.purple_500)) // tab background
     }
 }

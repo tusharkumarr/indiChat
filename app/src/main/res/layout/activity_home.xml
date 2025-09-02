@@ -16,10 +16,10 @@
             android:id="@+id/topAppBar"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
-            android:background="?attr/colorPrimary"
+            android:background="@color/white"
             app:title="IndiChat"
-            app:titleTextColor="@android:color/white"
-   />
+            app:titleTextAppearance="@style/Toolbar.TitleStyle" />
+
 
         <!-- Tabs -->
         <com.google.android.material.tabs.TabLayout
