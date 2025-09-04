@@ -44,4 +44,5 @@ object RetrofitClient {
 
     fun authApi(context: Context) = getRetrofit(context).create(AuthApi::class.java)
     fun chatApi(context: Context) = getRetrofit(context).create(ChatApi::class.java)
+    fun reelApi(context: Context) = getRetrofit(context).create(ReelApi::class.java)
 }

@@ -1,16 +1,27 @@
 package com.messenger.indiChat.fragments
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ProgressBar
+import android.widget.Toast
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.messenger.indiChat.Activity.AddReelActivity
 import com.messenger.indiChat.R
 import com.messenger.indiChat.adapters.ReelsAdapter
 
+import com.messenger.indiChat.network.RetrofitClient
+import kotlinx.coroutines.launch
+
 class ReelsFragment : Fragment() {
+
+    private lateinit var recyclerView: RecyclerView
+    private lateinit var progressBar: ProgressBar
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -18,41 +29,52 @@ class ReelsFragment : Fragment() {
     ): View? {
         val view = inflater.inflate(R.layout.fragment_reels, container, false)
 
-        val recyclerView = view.findViewById<RecyclerView>(R.id.recyclerUsers)
+        recyclerView = view.findViewById(R.id.recyclerUsers)
+        progressBar = view.findViewById(R.id.progressBar)
 
-        // Use Grid with 3 columns (like Instagram Reels grid)
         recyclerView.layoutManager = GridLayoutManager(requireContext(), 3)
 
-        // Fake image list (replace with real data later)
-        val images = listOf(
-            R.drawable.ic_person,  // Add some images to your drawable folder
-            R.drawable.ic_person,
-            R.drawable.ic_person,
-            R.drawable.ic_person,
-            R.drawable.ic_person,
-            R.drawable.ic_person,
-            R.drawable.ic_person,  // Add some images to your drawable folder
-            R.drawable.ic_person,
-            R.drawable.ic_person,
-            R.drawable.ic_person,
-            R.drawable.ic_person,
-            R.drawable.ic_person,
-            R.drawable.ic_person,  // Add some images to your drawable folder
-            R.drawable.ic_person,
-            R.drawable.ic_person,
-            R.drawable.ic_person,
-            R.drawable.ic_person,
-            R.drawable.ic_person,
-            R.drawable.ic_person,  // Add some images to your drawable folder
-            R.drawable.ic_person,
-            R.drawable.ic_person,
-            R.drawable.ic_person,
-            R.drawable.ic_person,
-            R.drawable.ic_person
-        )
+        loadReels()
 
-        recyclerView.adapter = ReelsAdapter(images)
+        // Example: Floating action button to add new reel
+        val fabAddReel = view.findViewById<com.google.android.material.floatingactionbutton.FloatingActionButton>(
+            R.id.fabAddReel
+        )
+        fabAddReel.setOnClickListener {
+            startActivity(Intent(requireContext(), AddReelActivity::class.java))
+        }
 
         return view
+    }
+
+    private fun loadReels() {
+        lifecycleScope.launch {
+            progressBar.visibility = View.VISIBLE
+            recyclerView.visibility = View.GONE
+
+            try {
+                val response = RetrofitClient.reelApi(requireContext()).getReels()
+                if (response.success) {
+                    val reels = response.data ?: emptyList()
+                    recyclerView.adapter = ReelsAdapter(reels) { reel ->
+                        // Handle reel click (open full screen or play video)
+                        Toast.makeText(requireContext(), "Clicked: ${reel.caption}", Toast.LENGTH_SHORT).show()
+                    }
+
+                    recyclerView.visibility = View.VISIBLE
+                } else {
+                    Toast.makeText(requireContext(), response.message, Toast.LENGTH_SHORT).show()
+                }
+            } catch (e: Exception) {
+                Toast.makeText(requireContext(), "Error: ${e.message}", Toast.LENGTH_SHORT).show()
+            } finally {
+                progressBar.visibility = View.GONE
+            }
+        }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        loadReels()
     }
 }
