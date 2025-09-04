@@ -12,9 +12,9 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.messenger.indiChat.Activity.AddReelActivity
+import com.messenger.indiChat.Activity.ReelPlayerActivity
 import com.messenger.indiChat.R
 import com.messenger.indiChat.adapters.ReelsAdapter
-
 import com.messenger.indiChat.network.RetrofitClient
 import kotlinx.coroutines.launch
 
@@ -36,7 +36,7 @@ class ReelsFragment : Fragment() {
 
         loadReels()
 
-        // Example: Floating action button to add new reel
+        // Floating action button to add new reel
         val fabAddReel = view.findViewById<com.google.android.material.floatingactionbutton.FloatingActionButton>(
             R.id.fabAddReel
         )
@@ -57,13 +57,18 @@ class ReelsFragment : Fragment() {
                 if (response.success) {
                     val reels = response.data ?: emptyList()
                     recyclerView.adapter = ReelsAdapter(reels) { reel ->
-                        // Handle reel click (open full screen or play video)
-                        Toast.makeText(requireContext(), "Clicked: ${reel.caption}", Toast.LENGTH_SHORT).show()
+                        // Open full-screen player when a reel is clicked
+                        val intent = Intent(requireContext(), ReelPlayerActivity::class.java)
+                        intent.putExtra("thumbnailGif", reel.thumbnailGif)
+                        intent.putExtra("videoUrl", reel.videoUrl)
+                        intent.putExtra("caption", reel.caption)
+                        intent.putExtra("id", reel.id)
+                        startActivity(intent)
                     }
 
                     recyclerView.visibility = View.VISIBLE
                 } else {
-                    Toast.makeText(requireContext(), response.message, Toast.LENGTH_SHORT).show()
+                    Toast.makeText(requireContext(), response.message ?: "Failed to load reels", Toast.LENGTH_SHORT).show()
                 }
             } catch (e: Exception) {
                 Toast.makeText(requireContext(), "Error: ${e.message}", Toast.LENGTH_SHORT).show()
@@ -78,3 +83,4 @@ class ReelsFragment : Fragment() {
         loadReels()
     }
 }
+

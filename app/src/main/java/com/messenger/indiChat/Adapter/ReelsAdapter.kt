@@ -31,7 +31,7 @@ class ReelsAdapter(
 
         // Load video thumbnail or placeholder
         Glide.with(holder.itemView.context)
-            .load(reel.videoUrl)
+            .load(reel.thumbnailGif)
             .placeholder(R.drawable.ic_person)
             .into(holder.reelImage)
 
