@@ -1,5 +1,6 @@
 package com.messenger.indiChat.fragments
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -10,8 +11,10 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.messenger.indiChat.Activity.AddReelActivity
 import com.messenger.indiChat.R
 import com.messenger.indiChat.adapters.ReelsAdapter
+
 import com.messenger.indiChat.network.RetrofitClient
 import kotlinx.coroutines.launch
 
@@ -33,6 +36,14 @@ class ReelsFragment : Fragment() {
 
         loadReels()
 
+        // Example: Floating action button to add new reel
+        val fabAddReel = view.findViewById<com.google.android.material.floatingactionbutton.FloatingActionButton>(
+            R.id.fabAddReel
+        )
+        fabAddReel.setOnClickListener {
+            startActivity(Intent(requireContext(), AddReelActivity::class.java))
+        }
+
         return view
     }
 
@@ -45,7 +56,10 @@ class ReelsFragment : Fragment() {
                 val response = RetrofitClient.reelApi(requireContext()).getReels()
                 if (response.success) {
                     val reels = response.data ?: emptyList()
-                    recyclerView.adapter = ReelsAdapter(reels)
+                    recyclerView.adapter = ReelsAdapter(reels) { reel ->
+                        // Handle reel click (open full screen or play video)
+                        Toast.makeText(requireContext(), "Clicked: ${reel.caption}", Toast.LENGTH_SHORT).show()
+                    }
 
                     recyclerView.visibility = View.VISIBLE
                 } else {
@@ -58,6 +72,7 @@ class ReelsFragment : Fragment() {
             }
         }
     }
+
     override fun onResume() {
         super.onResume()
         loadReels()
