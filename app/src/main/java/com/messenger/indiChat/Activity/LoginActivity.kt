@@ -8,8 +8,8 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import com.messenger.indiChat.R
 import com.messenger.indiChat.models.LoginRequest
-import com.messenger.indiChat.models.LoginResponse
 import com.messenger.indiChat.network.RetrofitClient
+import com.messenger.indiChat.repository.AuthRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -22,6 +22,8 @@ class LoginActivity : AppCompatActivity() {
     private lateinit var btnRegister: Button
     private lateinit var progressBar: ProgressBar
 
+    private lateinit var repository: AuthRepository
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_login)
@@ -31,6 +33,9 @@ class LoginActivity : AppCompatActivity() {
         btnLogin = findViewById(R.id.btnLogin)
         btnRegister = findViewById(R.id.btnRegister)
         progressBar = findViewById(R.id.progressBar)
+
+        // init repository
+        repository = AuthRepository(RetrofitClient.authApi(this))
 
         btnLogin.setOnClickListener {
             val userId = editUserId.text.toString().trim()
@@ -53,27 +58,30 @@ class LoginActivity : AppCompatActivity() {
 
         lifecycleScope.launch {
             try {
-                val response: LoginResponse = withContext(Dispatchers.IO) {
-                    RetrofitClient.authApi(this@LoginActivity)
-                        .login(LoginRequest(userId, password))
+                val loginData = withContext(Dispatchers.IO) {
+                    repository.login(LoginRequest(userId, password))
                 }
 
                 progressBar.visibility = View.GONE
                 btnLogin.isEnabled = true
 
-                if (response.success) {
+                if (loginData != null) {
                     val sharedPref = getSharedPreferences("MyAppPrefs", MODE_PRIVATE)
                     with(sharedPref.edit()) {
                         putBoolean("isLoggedIn", true)
                         putString("userId", userId)
-                        putString("jwtToken", response.token) // ✅ must match Retrofit interceptor
+                        putString("jwtToken", loginData.token)
                         apply()
                     }
 
                     startActivity(Intent(this@LoginActivity, HomeActivity::class.java))
                     finish()
                 } else {
-                    Toast.makeText(this@LoginActivity, response.message, Toast.LENGTH_SHORT).show()
+                    Toast.makeText(
+                        this@LoginActivity,
+                        "Login failed: ${loginData?.message ?: "Invalid credentials"}",
+                        Toast.LENGTH_SHORT
+                    ).show()
                 }
             } catch (e: Exception) {
                 e.printStackTrace()

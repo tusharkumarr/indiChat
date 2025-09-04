@@ -12,9 +12,10 @@ import com.messenger.indiChat.Adapter.ChatAdapter
 import com.messenger.indiChat.models.ChatMessage
 import com.messenger.indiChat.network.ChatWebSocketManager
 import com.messenger.indiChat.network.RetrofitClient
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
+import com.messenger.indiChat.repository.ChatRepository
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -28,6 +29,9 @@ class ChatActivity : AppCompatActivity() {
     private lateinit var receiverId: String
     private lateinit var receiverName: String
     private lateinit var currentUserId: String
+
+    // ✅ repository
+    private lateinit var chatRepository: ChatRepository
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -47,14 +51,14 @@ class ChatActivity : AppCompatActivity() {
 
         chatTitle.text = receiverName
 
-        // ✅ Back button functionality
-        backButton.setOnClickListener {
-            finish() // closes ChatActivity and returns to previous screen
-        }
+        backButton.setOnClickListener { finish() }
 
         chatAdapter = ChatAdapter(messages, currentUserId)
         recyclerView.layoutManager = LinearLayoutManager(this)
         recyclerView.adapter = chatAdapter
+
+        // ✅ init repository
+        chatRepository = ChatRepository(RetrofitClient.chatApi(this))
 
         fetchPreviousMessages()
 
@@ -73,7 +77,7 @@ class ChatActivity : AppCompatActivity() {
             }
         }
 
-        chatWebSocketManager.connect() // ✅ Backend decodes user from JWT
+        chatWebSocketManager.connect()
 
         sendButton.setOnClickListener {
             val text = editText.text.toString().trim()
@@ -102,22 +106,22 @@ class ChatActivity : AppCompatActivity() {
     }
 
     private fun fetchPreviousMessages() {
-        val api = RetrofitClient.chatApi(this)
-        api.getMessages(receiverId)
-            .enqueue(object : Callback<List<ChatMessage>> {
-                override fun onResponse(call: Call<List<ChatMessage>>, response: Response<List<ChatMessage>>) {
-                    val list = response.body() ?: emptyList()
-                    val sortedList = list.sortedWith(compareBy { it.timestamp ?: "" })
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                val list = chatRepository.getMessages(receiverId) // ✅ use repository
+                val sortedList = list.sortedWith(compareBy { it.timestamp ?: "" })
+                runOnUiThread {
                     messages.addAll(sortedList)
                     chatAdapter.notifyDataSetChanged()
                     recyclerView.scrollToPosition(messages.size - 1)
                 }
-
-                override fun onFailure(call: Call<List<ChatMessage>>, t: Throwable) {
-                    t.printStackTrace()
+            } catch (e: Exception) {
+                e.printStackTrace()
+                runOnUiThread {
                     Toast.makeText(this@ChatActivity, "Failed to fetch messages", Toast.LENGTH_SHORT).show()
                 }
-            })
+            }
+        }
     }
 
     private fun formatTime(timestamp: String?): String {

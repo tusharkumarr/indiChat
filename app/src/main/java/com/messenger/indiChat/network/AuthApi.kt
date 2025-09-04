@@ -1,5 +1,6 @@
 package com.messenger.indiChat.network
 
+import com.messenger.indiChat.models.GenericResponse
 import com.messenger.indiChat.models.LoginRequest
 import com.messenger.indiChat.models.LoginResponse
 import com.messenger.indiChat.models.SignupRequest
@@ -8,9 +9,10 @@ import retrofit2.http.Body
 import retrofit2.http.POST
 
 interface AuthApi {
-    @POST("auth/login") // replace with your actual endpoint
-    suspend fun login(@Body request: LoginRequest): LoginResponse
+
+    @POST("auth/login")
+    suspend fun login(@Body request: LoginRequest): GenericResponse<LoginResponse>
 
     @POST("auth/signup")
-    suspend fun signup(@Body request: SignupRequest): SignupResponse
+    suspend fun signup(@Body request: SignupRequest): GenericResponse<SignupResponse>
 }

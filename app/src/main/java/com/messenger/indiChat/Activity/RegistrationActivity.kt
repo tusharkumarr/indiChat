@@ -9,6 +9,7 @@ import androidx.lifecycle.lifecycleScope
 import com.messenger.indiChat.R
 import com.messenger.indiChat.models.SignupRequest
 import com.messenger.indiChat.network.RetrofitClient
+import com.messenger.indiChat.repository.AuthRepository
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.*
@@ -23,6 +24,9 @@ class RegistrationActivity : AppCompatActivity() {
     private lateinit var btnRegister: Button
     private lateinit var progressBar: ProgressBar
 
+    // ✅ Use repository directly (no ViewModel)
+    private lateinit var authRepository: AuthRepository
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_registration)
@@ -35,6 +39,9 @@ class RegistrationActivity : AppCompatActivity() {
         editDob = findViewById(R.id.editDob)
         btnRegister = findViewById(R.id.btnRegister)
         progressBar = findViewById(R.id.progressBar)
+
+        // ✅ Init repository with RetrofitClient
+        authRepository = AuthRepository(RetrofitClient.authApi(this))
 
         // Handle DOB picker
         editDob.setOnClickListener { showDatePicker() }
@@ -94,16 +101,17 @@ class RegistrationActivity : AppCompatActivity() {
         lifecycleScope.launch {
             try {
                 val request = SignupRequest(name, mobile, password, dob)
-                val response = RetrofitClient.authApi(this@RegistrationActivity).signup(request)
+                val response = authRepository.signup(request)
 
-                Toast.makeText(this@RegistrationActivity, response.message, Toast.LENGTH_SHORT).show()
-
-                if (response.success) {
+                if (response != null) {
+                    Toast.makeText(this@RegistrationActivity, "Signup successful!", Toast.LENGTH_SHORT).show()
                     finish() // Close registration and go back to login
+                } else {
+                    Toast.makeText(this@RegistrationActivity, "Signup failed. Try again.", Toast.LENGTH_SHORT).show()
                 }
             } catch (e: Exception) {
                 e.printStackTrace()
-                Toast.makeText(this@RegistrationActivity, "Signup failed. Try again.", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this@RegistrationActivity, "Error: ${e.message}", Toast.LENGTH_SHORT).show()
             } finally {
                 progressBar.visibility = View.GONE
                 btnRegister.isEnabled = true

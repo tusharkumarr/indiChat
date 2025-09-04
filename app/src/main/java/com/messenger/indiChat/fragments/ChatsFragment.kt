@@ -14,7 +14,6 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.messenger.indiChat.Activity.AddChatActivity
-
 import com.messenger.indiChat.Activity.LoginActivity
 import com.messenger.indiChat.Adapter.UserAdapter
 import com.messenger.indiChat.ChatActivity
@@ -80,10 +79,15 @@ class ChatsFragment : Fragment() {
         progressBar.visibility = View.VISIBLE
         viewLifecycleOwner.lifecycleScope.launch {
             try {
-                val users = RetrofitClient.chatApi(requireContext()).getChatUsers()
-                userList.clear()
-                userList.addAll(users)
-                userAdapter.notifyDataSetChanged()
+                val response = RetrofitClient.chatApi(requireContext()).getChatUsers()
+
+                if (response.success) {  // assuming GenericResponse has a 'success' field
+                    userList.clear()
+                    userList.addAll(response.data ?: emptyList()) // ✅ use response.data
+                    userAdapter.notifyDataSetChanged()
+                } else {
+                    Toast.makeText(requireContext(), response.message ?: "Failed to load users", Toast.LENGTH_SHORT).show()
+                }
             } catch (e: Exception) {
                 e.printStackTrace()
                 Toast.makeText(requireContext(), "Failed to load users", Toast.LENGTH_SHORT).show()
