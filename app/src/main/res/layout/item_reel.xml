@@ -1,14 +1,28 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="200dp"
-    android:layout_margin="4dp"
-    android:background="@drawable/reel_item_bg">
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="4dp">
 
+    <!-- Thumbnail -->
     <ImageView
         android:id="@+id/reelImage"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="120dp"
         android:scaleType="centerCrop"
-        android:contentDescription="Reel Image" />
-</FrameLayout>
+        android:background="@color/black" />
+
+    <!-- Caption -->
+    <TextView
+        android:id="@+id/reelCaption"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:ellipsize="end"
+        android:singleLine="true"
+        android:text="Sample caption"
+        android:textColor="@android:color/black"
+        android:textSize="12sp"
+        android:paddingTop="2dp"
+        android:gravity="center"/>
+</LinearLayout>
