@@ -18,6 +18,7 @@
         android:gravity="end"
         android:layout_gravity="top">
 
+        <!-- Flash Button -->
         <ImageButton
             android:id="@+id/btnFlash"
             android:layout_width="48dp"
@@ -26,6 +27,7 @@
             android:src="@drawable/ic_flash_off"
             android:contentDescription="Flash" />
 
+        <!-- Switch Camera Button -->
         <ImageButton
             android:id="@+id/btnSwitchCamera"
             android:layout_width="48dp"
@@ -66,7 +68,7 @@
             android:src="@drawable/ic_record"
             android:contentDescription="Capture" />
 
-        <!-- Timer / Progress placeholder -->
+        <!-- Timer / Progress bar -->
         <ProgressBar
             android:id="@+id/progressRecording"
             style="?android:attr/progressBarStyleHorizontal"
@@ -81,5 +83,4 @@
             android:visibility="gone" />
     </LinearLayout>
 
-    <!-- Optional: Add captions / stickers / effects buttons here -->
 </FrameLayout>
