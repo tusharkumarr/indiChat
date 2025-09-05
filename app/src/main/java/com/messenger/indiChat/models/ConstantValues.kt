@@ -3,23 +3,25 @@ package com.messenger.indiChat.models
 import android.content.Context
 
 object ConstantValues {
-    // Use only the host, no scheme
-    const val BASE_URL: String = "indichatbackend.onrender.com"
+    private const val env = "dev" // change to "prod" when needed
 
+    private val BASE_URL: String = when (env) {
+        "dev" -> "10.0.2.2:8080"   // Localhost for emulator
+        "prod" -> "indichatbackend.onrender.com"
+        else -> "indichatbackend.onrender.com"
+    }
 
     // Retrofit requires scheme
-    const val RETROFIT_BASE_URL: String = "https://$BASE_URL/"
+    val RETROFIT_BASE_URL: String = when (env) {
+        "dev" -> "http://$BASE_URL/"
+        else -> "https://$BASE_URL/"
+    }
 
-    // WebSocket/STOMP requires secure websocket scheme
-    const val WEBSOCKET_URL: String = "wss://$BASE_URL/ws/websocket"
-
-//    for local host
-//    const val BASE_URL: String = "10.0.2.2:8080"
-//    // Retrofit requires scheme
-//    const val RETROFIT_BASE_URL: String = "http://$BASE_URL/"
-//
-//    // WebSocket/STOMP requires secure websocket scheme
-//    const val WEBSOCKET_URL: String = "ws://$BASE_URL/ws/websocket"
+    // WebSocket/STOMP
+    val WEBSOCKET_URL: String = when (env) {
+        "dev" -> "ws://$BASE_URL/ws/websocket"
+        else -> "wss://$BASE_URL/ws/websocket"
+    }
 
     fun getToken(context: Context): String? {
         val sharedPref = context.getSharedPreferences("MyAppPrefs", Context.MODE_PRIVATE)
