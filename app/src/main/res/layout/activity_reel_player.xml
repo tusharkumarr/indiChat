@@ -1,46 +1,48 @@
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:background="@android:color/black">
 
-    <!-- Replace ExoPlayer PlayerView with native VideoView -->
-    <VideoView
-        android:id="@+id/videoView"
+    <!-- Custom ExoPlayer View -->
+    <androidx.media3.ui.PlayerView
+        android:id="@+id/playerView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="#000"
-        android:keepScreenOn="true" />
+        android:keepScreenOn="true"
+        app:use_controller="false" />
 
-    <!-- Overlay buttons: Like, Share, Close -->
-    <LinearLayout
-        android:orientation="horizontal"
-        android:layout_gravity="bottom|end"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:padding="16dp">
+    <!-- Close button -->
+    <ImageButton
+        android:id="@+id/btnClose"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:layout_margin="16dp"
+        android:background="@android:color/transparent"
+        android:src="@drawable/ic_launcher_foreground"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentEnd="true"/>
 
-        <ImageButton
-            android:id="@+id/btnLike"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
-            android:background="@null"
-            android:src="@drawable/ic_arrow_back" />
+    <!-- Like button -->
+    <ImageButton
+        android:id="@+id/btnLike"
+        android:layout_width="56dp"
+        android:layout_height="56dp"
+        android:layout_margin="16dp"
+        android:background="@android:color/transparent"
+        android:src="@drawable/ic_add_reel"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentEnd="true"/>
 
-        <ImageButton
-            android:id="@+id/btnShare"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
-            android:layout_marginStart="8dp"
-            android:background="@null"
-            android:src="@drawable/ic_record" />
+    <!-- Share button -->
+    <ImageButton
+        android:id="@+id/btnShare"
+        android:layout_width="56dp"
+        android:layout_height="56dp"
+        android:layout_marginBottom="90dp"
+        android:background="@android:color/transparent"
+        android:src="@drawable/ic_gallery"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentEnd="true"/>
 
-        <ImageButton
-            android:id="@+id/btnClose"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
-            android:layout_marginStart="8dp"
-            android:background="@null"
-            android:src="@drawable/ic_person" />
-    </LinearLayout>
-
-</FrameLayout>
+</RelativeLayout>

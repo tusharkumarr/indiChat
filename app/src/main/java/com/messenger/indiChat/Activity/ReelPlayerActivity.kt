@@ -4,31 +4,34 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.widget.ImageButton
-import android.widget.MediaController
 import android.widget.Toast
-import android.widget.VideoView
 import androidx.appcompat.app.AppCompatActivity
+import androidx.media3.common.MediaItem
+import androidx.media3.exoplayer.ExoPlayer
+import androidx.media3.ui.PlayerView
 import com.messenger.indiChat.R
 
 class ReelPlayerActivity : AppCompatActivity() {
 
-    private lateinit var videoView: VideoView
+    private lateinit var playerView: PlayerView
+    private var player: ExoPlayer? = null
     private lateinit var btnLike: ImageButton
     private lateinit var btnShare: ImageButton
     private lateinit var btnClose: ImageButton
+    private var reelUrl: String = ""
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_reel_player)
 
-        videoView = findViewById(R.id.videoView)
+        playerView = findViewById(R.id.playerView)
         btnLike = findViewById(R.id.btnLike)
         btnShare = findViewById(R.id.btnShare)
         btnClose = findViewById(R.id.btnClose)
 
-        val reelUrl = intent.getStringExtra("videoUrl") ?: ""
+        reelUrl = intent.getStringExtra("videoUrl") ?: ""
         if (reelUrl.isNotEmpty()) {
-            setupVideoPlayer(reelUrl)
+            setupExoPlayer(reelUrl)
         }
 
         btnLike.setOnClickListener {
@@ -37,7 +40,6 @@ class ReelPlayerActivity : AppCompatActivity() {
         }
 
         btnShare.setOnClickListener {
-            // Share via intent
             val shareIntent = Intent(Intent.ACTION_SEND).apply {
                 type = "text/plain"
                 putExtra(Intent.EXTRA_TEXT, reelUrl)
@@ -50,38 +52,30 @@ class ReelPlayerActivity : AppCompatActivity() {
         }
     }
 
-    private fun setupVideoPlayer(url: String) {
-        val uri = Uri.parse(url)
-        videoView.setVideoURI(uri)
-
-        // Optional: add media controls (play/pause)
-        val mediaController = MediaController(this)
-        mediaController.setAnchorView(videoView)
-        videoView.setMediaController(mediaController)
-
-        videoView.setOnPreparedListener { mp ->
-            mp.isLooping = true  // loop the video
-            videoView.start()
-        }
-
-        videoView.setOnErrorListener { _, _, _ ->
-            Toast.makeText(this, "Failed to play video", Toast.LENGTH_SHORT).show()
-            true
+    private fun setupExoPlayer(url: String) {
+        player = ExoPlayer.Builder(this).build().also { exoPlayer ->
+            playerView.player = exoPlayer
+            val mediaItem = MediaItem.fromUri(Uri.parse(url))
+            exoPlayer.setMediaItem(mediaItem)
+            exoPlayer.repeatMode = ExoPlayer.REPEAT_MODE_ONE // loop video
+            exoPlayer.prepare()
+            exoPlayer.play()
         }
     }
 
     override fun onPause() {
         super.onPause()
-        if (videoView.isPlaying) videoView.pause()
+        player?.pause()
     }
 
     override fun onResume() {
         super.onResume()
-        videoView.start()
+        player?.play()
     }
 
     override fun onDestroy() {
         super.onDestroy()
-        videoView.stopPlayback()
+        player?.release()
+        player = null
     }
 }
