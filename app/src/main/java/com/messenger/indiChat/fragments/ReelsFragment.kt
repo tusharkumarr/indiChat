@@ -19,6 +19,7 @@ import com.messenger.indiChat.Activity.ReelPlayerActivity
 import com.messenger.indiChat.R
 import com.messenger.indiChat.adapters.ReelsAdapter
 import com.messenger.indiChat.network.RetrofitClient
+import com.messenger.indiChat.repository.ReelRepository
 import kotlinx.coroutines.launch
 
 class ReelsFragment : Fragment() {
@@ -30,6 +31,9 @@ class ReelsFragment : Fragment() {
     private lateinit var currentUserId: String
     private var token: String? = null
 
+    // ✅ Use repository instead of direct API call
+    private lateinit var reelRepository: ReelRepository
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -40,12 +44,14 @@ class ReelsFragment : Fragment() {
         token = sharedPref.getString("jwtToken", null)
         currentUserId = sharedPref.getString("userId", "") ?: ""
 
-        // ✅ If no login info found → redirect to LoginActivity
         if (token.isNullOrEmpty() || currentUserId.isEmpty()) {
             startActivity(Intent(requireContext(), LoginActivity::class.java))
             requireActivity().finish()
             return view
         }
+
+        // ✅ Initialize repository with API
+        reelRepository = ReelRepository(RetrofitClient.reelApi(requireContext()))
 
         recyclerView = view.findViewById(R.id.recyclerUsers)
         progressBar = view.findViewById(R.id.progressBar)
@@ -58,7 +64,6 @@ class ReelsFragment : Fragment() {
         }
 
         loadRecommendedReels()
-
         return view
     }
 
@@ -68,9 +73,7 @@ class ReelsFragment : Fragment() {
             recyclerView.visibility = View.GONE
 
             try {
-                val api = RetrofitClient.reelApi(requireContext())
-
-                val response = api.getHybridRecommendations(
+                val response = reelRepository.getHybridRecommendations(
                     userId = currentUserId,
                     topN = 15
                 )
