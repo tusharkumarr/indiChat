@@ -21,9 +21,7 @@ class AddChatActivity : AppCompatActivity() {
     private lateinit var searchNewUser: SearchView
     private lateinit var userAdapter: UserAdapter
     private val userList = mutableListOf<User>()
-    private val allUsers = mutableListOf<User>()
 
-    // ✅ repository
     private lateinit var chatRepository: ChatRepository
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -32,14 +30,6 @@ class AddChatActivity : AppCompatActivity() {
 
         recyclerNewUsers = findViewById(R.id.recyclerNewUsers)
         searchNewUser = findViewById(R.id.searchNewUser)
-
-        searchNewUser.setIconifiedByDefault(false)
-        searchNewUser.isIconified = false
-        searchNewUser.clearFocus()
-
-        searchNewUser.setOnQueryTextFocusChangeListener { _, hasFocus ->
-            if (hasFocus) searchNewUser.isIconified = false
-        }
 
         recyclerNewUsers.layoutManager = LinearLayoutManager(this)
         userAdapter = UserAdapter(userList) { user ->
@@ -51,46 +41,33 @@ class AddChatActivity : AppCompatActivity() {
         }
         recyclerNewUsers.adapter = userAdapter
 
-        // ✅ init repository
         chatRepository = ChatRepository(RetrofitClient.chatApi(this))
 
-        fetchAllUsers()
-
+        // 🔹 Only trigger search when input length >= 2
         searchNewUser.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(query: String?) = false
             override fun onQueryTextChange(newText: String?): Boolean {
-                filterUsers(newText)
+                if (!newText.isNullOrEmpty() && newText.length >= 2) {
+                    searchUsers(newText)
+                } else {
+                    userList.clear()
+                    userAdapter.notifyDataSetChanged()
+                }
                 return true
             }
         })
     }
 
-    private fun fetchAllUsers() {
+    private fun searchUsers(query: String) {
         lifecycleScope.launch {
             try {
-                val users = chatRepository.getAllUsers() // ✅ use repository
-                allUsers.clear()
-                allUsers.addAll(users)
-
+                val results = chatRepository.searchUsers(query)
                 userList.clear()
-                userList.addAll(users)
-
+                userList.addAll(results)
                 userAdapter.notifyDataSetChanged()
             } catch (e: Exception) {
                 e.printStackTrace()
             }
         }
-    }
-
-    private fun filterUsers(query: String?) {
-        val filtered = if (query.isNullOrEmpty()) {
-            allUsers
-        } else {
-            allUsers.filter { it.phoneNumber.contains(query, ignoreCase = true) }
-        }
-
-        userList.clear()
-        userList.addAll(filtered)
-        userAdapter.notifyDataSetChanged()
     }
 }

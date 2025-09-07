@@ -15,4 +15,13 @@ class ChatRepository(private val api: ChatApi) {
         val response = api.getAllUsers()
         return response.data ?: emptyList()
     }
+
+    suspend fun searchUsers(query: String): List<User> {
+        val response = api.searchUsers(query)
+        if (response.isSuccessful) {
+            return response.body()?.data ?: emptyList()
+        } else {
+            throw Exception("Failed: ${response.code()}")
+        }
+    }
 }

@@ -4,6 +4,7 @@ import com.messenger.indiChat.models.ChatMessage
 import com.messenger.indiChat.models.GenericResponse
 import com.messenger.indiChat.models.User
 import retrofit2.Call
+import retrofit2.Response
 import retrofit2.http.GET
 import retrofit2.http.Query
 
@@ -19,4 +20,7 @@ interface ChatApi {
 
     @GET("api/users/all")
     suspend fun getAllUsers(): GenericResponse<List<User>>
+
+    @GET("api/users/search")
+    suspend fun searchUsers(@Query("query") query: String): Response<GenericResponse<List<User>>>
 }
