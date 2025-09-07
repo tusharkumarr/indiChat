@@ -13,7 +13,7 @@
         android:keepScreenOn="true"
         app:use_controller="false" />
 
-    <!-- Close button top-right -->
+    <!-- Back button top-left -->
     <ImageButton
         android:id="@+id/btnClose"
         android:layout_width="48dp"
@@ -21,9 +21,9 @@
         android:layout_margin="16dp"
         android:background="@android:color/transparent"
         android:src="@drawable/ic_arrow_back"
-        android:layout_gravity="top|end"/>
+        android:layout_gravity="top|start"/>
 
-    <!-- Vertical buttons on right side (bottom) -->
+    <!-- Vertical buttons on right side -->
     <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -48,7 +48,6 @@
             android:background="@android:color/transparent"
             android:src="@drawable/ic_share" />
 
-        <!-- Optional comment button -->
         <ImageButton
             android:id="@+id/btnComment"
             android:layout_width="56dp"
