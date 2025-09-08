@@ -94,8 +94,6 @@ class ReelsFragment : Fragment() {
                     } else {
                         Toast.makeText(requireContext(), body?.message ?: "No recommendations", Toast.LENGTH_SHORT).show()
                     }
-                } else {
-                    Toast.makeText(requireContext(), "Failed: ${response.code()}", Toast.LENGTH_SHORT).show()
                 }
 
             } catch (e: Exception) {
