@@ -49,7 +49,7 @@ object RetrofitClient {
                             message = parsed.message
 
                             // 👇 Handle invalid/expired token specifically
-                            if (message.contains("Invalid or expired token", ignoreCase = true)) {
+                            if (message.contains("expired token", ignoreCase = true)) {
                                 Handler(Looper.getMainLooper()).post {
                                     Toast.makeText(context, "Session expired. Please login again.", Toast.LENGTH_LONG).show()
 
