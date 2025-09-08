@@ -85,13 +85,6 @@ class LoginActivity : AppCompatActivity() {
                 }
             } catch (e: Exception) {
                 e.printStackTrace()
-                progressBar.visibility = View.GONE
-                btnLogin.isEnabled = true
-                Toast.makeText(
-                    this@LoginActivity,
-                    "Login failed: ${e.localizedMessage}",
-                    Toast.LENGTH_SHORT
-                ).show()
             }
         }
     }
