@@ -111,7 +111,6 @@ class RegistrationActivity : AppCompatActivity() {
                 }
             } catch (e: Exception) {
                 e.printStackTrace()
-                Toast.makeText(this@RegistrationActivity, "Error: ${e.message}", Toast.LENGTH_SHORT).show()
             } finally {
                 progressBar.visibility = View.GONE
                 btnRegister.isEnabled = true
