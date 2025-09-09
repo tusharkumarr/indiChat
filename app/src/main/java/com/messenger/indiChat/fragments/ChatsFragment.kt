@@ -14,9 +14,9 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.messenger.indiChat.Activity.AddChatActivity
+import com.messenger.indiChat.ChatActivity
 import com.messenger.indiChat.Activity.LoginActivity
 import com.messenger.indiChat.Adapter.UserAdapter
-import com.messenger.indiChat.ChatActivity
 import com.messenger.indiChat.R
 import com.messenger.indiChat.models.User
 import com.messenger.indiChat.network.RetrofitClient

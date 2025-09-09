@@ -15,17 +15,15 @@
         android:paddingStart="8dp"
         android:paddingEnd="16dp">
 
-        <!-- Back Button -->
         <ImageButton
             android:id="@+id/backButton"
             android:layout_width="40dp"
             android:layout_height="40dp"
             android:background="?attr/selectableItemBackgroundBorderless"
             android:src="@drawable/ic_arrow_back"
-        android:contentDescription="Back"
-        app:tint="#FFFFFF" />
+            android:contentDescription="Back"
+            app:tint="#FFFFFF" />
 
-        <!-- Display Picture -->
         <ImageView
             android:id="@+id/displayPicture"
             android:layout_width="40dp"
@@ -36,7 +34,6 @@
             android:background="@drawable/circle_background"
             android:contentDescription="Profile Picture" />
 
-        <!-- Chat Title -->
         <TextView
             android:id="@+id/chatTitle"
             android:layout_width="wrap_content"
@@ -55,6 +52,16 @@
         android:layout_height="0dp"
         android:layout_weight="1"
         android:padding="8dp" />
+
+    <!-- Suggestions Row -->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/suggestionsRecyclerView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="4dp"
+        android:overScrollMode="never"
+        android:visibility="gone"
+        android:orientation="horizontal" />
 
     <!-- Input area -->
     <LinearLayout
