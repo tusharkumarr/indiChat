@@ -6,5 +6,4 @@
         <item name="android:textSize">22sp</item> <!-- adjust as needed -->
         <item name="android:textColor">@color/purple_500</item>
     </style>
-
 </resources>

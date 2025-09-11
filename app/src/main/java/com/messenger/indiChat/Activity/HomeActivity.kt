@@ -1,8 +1,11 @@
 package com.messenger.indiChat.Activity
 
 import android.os.Bundle
+import android.view.MenuItem
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.viewpager2.widget.ViewPager2
+import com.google.android.material.appbar.MaterialToolbar
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
 import com.messenger.indiChat.Adapter.ViewPagerAdapter
@@ -14,6 +17,7 @@ class HomeActivity : AppCompatActivity() {
 
     private lateinit var viewPager: ViewPager2
     private lateinit var tabLayout: TabLayout
+    private lateinit var topAppBar: MaterialToolbar
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -21,29 +25,38 @@ class HomeActivity : AppCompatActivity() {
 
         viewPager = findViewById(R.id.viewPager)
         tabLayout = findViewById(R.id.tabLayout)
+        topAppBar = findViewById(R.id.topAppBar)
 
-        val fragments = listOf(
-            ChatsFragment(),
-            ReelsFragment()
-        )
-
+        // Setup ViewPager and Tabs
+        val fragments = listOf(ChatsFragment(), ReelsFragment())
         val adapter = ViewPagerAdapter(this, fragments)
         viewPager.adapter = adapter
 
-        // Attach tabs with ViewPager
         TabLayoutMediator(tabLayout, viewPager) { tab, position ->
-            when (position) {
-                0 -> tab.text = "Chats"
-                1 -> tab.text = "Reels"
-            }
+            tab.text = if (position == 0) "Chats" else "Reels"
         }.attach()
 
-        // 🎨 Customize tab colors programmatically
-        tabLayout.setSelectedTabIndicatorColor(getColor(R.color.purple_500)) // indicator
-        tabLayout.setTabTextColors(
-            getColor(R.color.gray), // unselected text
-            getColor(R.color.white) // selected text
-        )
-        tabLayout.setBackgroundColor(getColor(R.color.purple_500)) // tab background
+        tabLayout.setSelectedTabIndicatorColor(getColor(R.color.purple_500))
+        tabLayout.setTabTextColors(getColor(R.color.gray), getColor(R.color.white))
+        tabLayout.setBackgroundColor(getColor(R.color.purple_500))
+
+        // Menu item click listener
+        topAppBar.setOnMenuItemClickListener { item: MenuItem ->
+            when(item.itemId){
+                R.id.action_myprofile -> {
+                    Toast.makeText(this, "Profile clicked", Toast.LENGTH_SHORT).show()
+                    true
+                }
+                R.id.action_logout -> {
+                    Toast.makeText(this, "Logout clicked", Toast.LENGTH_SHORT).show()
+                    true
+                }
+                R.id.action_settings -> {
+                    Toast.makeText(this, "Settings clicked", Toast.LENGTH_SHORT).show()
+                    true
+                }
+                else -> false
+            }
+        }
     }
 }

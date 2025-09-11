@@ -11,15 +11,15 @@
         android:layout_height="wrap_content"
         android:theme="@style/ThemeOverlay.Material3.Dark.ActionBar">
 
-        <!-- Customizable Toolbar -->
         <com.google.android.material.appbar.MaterialToolbar
             android:id="@+id/topAppBar"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
             android:background="@color/white"
             app:title="IndiChat"
-            app:titleTextAppearance="@style/Toolbar.TitleStyle" />
-
+            app:titleTextColor="@color/purple_500"
+            app:menu="@menu/top_app_bar_menu"
+            app:popupTheme="@style/ThemeOverlay.Material3.Light" />
 
         <!-- Tabs -->
         <com.google.android.material.tabs.TabLayout
@@ -28,10 +28,8 @@
             android:layout_height="wrap_content"
             app:tabIndicatorColor="@android:color/white"
             app:tabSelectedTextColor="@android:color/white"
-            app:tabTextColor="@android:color/darker_gray"/>
+            app:tabTextColor="@android:color/darker_gray" />
     </com.google.android.material.appbar.AppBarLayout>
-
-    <!-- Pager (fragments switch here) -->
     <androidx.viewpager2.widget.ViewPager2
         android:id="@+id/viewPager"
         android:layout_width="match_parent"
