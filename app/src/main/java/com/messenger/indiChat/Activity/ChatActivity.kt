@@ -41,7 +41,7 @@ class ChatActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_chat)
 
-        val sharedPref = getSharedPreferences("MyAppPrefs", MODE_PRIVATE)
+        val sharedPref = getSharedPreferences("indiChatPrefs", MODE_PRIVATE)
         currentUserId = sharedPref.getString("userId", "") ?: ""
 
         receiverId = intent.getStringExtra("userId") ?: ""

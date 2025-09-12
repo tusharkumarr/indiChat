@@ -7,8 +7,8 @@ object ConstantValues {
 
     private val BASE_URL: String = when (env) {
         "dev" -> "10.0.2.2:8080"   // Localhost for emulator
-        "prod" -> "indichatbackend.onrender.com"
-        else -> "indichatbackend.onrender.com"
+        "prod" -> "08a37bb5ab53.ngrok-free.app"
+        else -> "08a37bb5ab53.ngrok-free.app"
     }
 
     // Retrofit requires scheme
@@ -24,7 +24,7 @@ object ConstantValues {
     }
 
     fun getToken(context: Context): String? {
-        val sharedPref = context.getSharedPreferences("MyAppPrefs", Context.MODE_PRIVATE)
+        val sharedPref = context.getSharedPreferences("indiChatPrefs", Context.MODE_PRIVATE)
         return sharedPref.getString("token", null)
     }
 }

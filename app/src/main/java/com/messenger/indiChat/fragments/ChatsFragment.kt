@@ -14,9 +14,9 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.messenger.indiChat.Activity.AddChatActivity
-import com.messenger.indiChat.ChatActivity
 import com.messenger.indiChat.Activity.LoginActivity
 import com.messenger.indiChat.Adapter.UserAdapter
+import com.messenger.indiChat.ChatActivity
 import com.messenger.indiChat.R
 import com.messenger.indiChat.models.User
 import com.messenger.indiChat.network.RetrofitClient
@@ -33,21 +33,25 @@ class ChatsFragment : Fragment() {
     private lateinit var currentUserId: String
 
     override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
+        inflater: LayoutInflater,
+        container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
         val view = inflater.inflate(R.layout.fragment_chats, container, false)
 
-        val sharedPref = requireContext().getSharedPreferences("MyAppPrefs", Context.MODE_PRIVATE)
+        // Get token + userId from SharedPreferences
+        val sharedPref = requireContext().getSharedPreferences("indiChatPrefs", Context.MODE_PRIVATE)
         val token = sharedPref.getString("jwtToken", null)
         currentUserId = sharedPref.getString("userId", "") ?: ""
 
+        // Redirect to login if no session found
         if (token.isNullOrEmpty() || currentUserId.isEmpty()) {
             startActivity(Intent(requireContext(), LoginActivity::class.java))
             requireActivity().finish()
             return view
         }
 
+        // Init views
         recyclerUsers = view.findViewById(R.id.recyclerUsers)
         progressBar = view.findViewById(R.id.progressBar)
         fabNewChat = view.findViewById(R.id.fabNewChat)
@@ -55,9 +59,10 @@ class ChatsFragment : Fragment() {
         recyclerUsers.layoutManager = LinearLayoutManager(requireContext())
 
         userAdapter = UserAdapter(userList) { selectedUser ->
-            val intent = Intent(requireContext(), ChatActivity::class.java)
-            intent.putExtra("userId", selectedUser.id)
-            intent.putExtra("userName", selectedUser.name)
+            val intent = Intent(requireContext(), ChatActivity::class.java).apply {
+                putExtra("userId", selectedUser.id)
+                putExtra("userName", selectedUser.name)
+            }
             startActivity(intent)
         }
         recyclerUsers.adapter = userAdapter
@@ -66,7 +71,6 @@ class ChatsFragment : Fragment() {
             startActivity(Intent(requireContext(), AddChatActivity::class.java))
         }
 
-        fetchChatUsers()
         return view
     }
 
@@ -81,15 +85,20 @@ class ChatsFragment : Fragment() {
             try {
                 val response = RetrofitClient.chatApi(requireContext()).getChatUsers()
 
-                if (response.success) {  // assuming GenericResponse has a 'success' field
+                if (response.success) {
                     userList.clear()
-                    userList.addAll(response.data ?: emptyList()) // ✅ use response.data
+                    userList.addAll(response.data ?: emptyList())
                     userAdapter.notifyDataSetChanged()
                 } else {
-                    Toast.makeText(requireContext(), response.message ?: "Failed to load users", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(
+                        requireContext(),
+                        response.message ?: "Failed to load users",
+                        Toast.LENGTH_SHORT
+                    ).show()
                 }
             } catch (e: Exception) {
                 e.printStackTrace()
+                Toast.makeText(requireContext(), "Error fetching users", Toast.LENGTH_SHORT).show()
             } finally {
                 progressBar.visibility = View.GONE
             }

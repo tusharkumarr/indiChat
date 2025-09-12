@@ -16,15 +16,16 @@ class MainActivity : AppCompatActivity() {
         AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
         setContentView(R.layout.activity_main) // splash XML
 
-        val sharedPref = getSharedPreferences("MyAppPrefs", MODE_PRIVATE)
-        val isLoggedIn = sharedPref.getBoolean("isLoggedIn", false)
+        val sharedPref = getSharedPreferences("indiChatPrefs", MODE_PRIVATE)
+        val token = sharedPref.getString("jwtToken", null)
+        val userId = sharedPref.getString("userId", null)
 
         Handler(Looper.getMainLooper()).postDelayed({
-            if (isLoggedIn) {
-                // Already logged in → go to HomeActivity
+            if (!token.isNullOrEmpty() && !userId.isNullOrEmpty()) {
+                // ✅ User has token and userId → go to Home
                 startActivity(Intent(this, HomeActivity::class.java))
             } else {
-                // Not logged in → go to LoginActivity
+                // ❌ No valid session → go to Login
                 startActivity(Intent(this, LoginActivity::class.java))
             }
             finish()

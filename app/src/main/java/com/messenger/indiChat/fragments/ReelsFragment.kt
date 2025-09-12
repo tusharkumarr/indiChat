@@ -40,7 +40,7 @@ class ReelsFragment : Fragment() {
     ): View? {
         val view = inflater.inflate(R.layout.fragment_reels, container, false)
 
-        val sharedPref = requireContext().getSharedPreferences("MyAppPrefs", Context.MODE_PRIVATE)
+        val sharedPref = requireContext().getSharedPreferences("indiChatPrefs", Context.MODE_PRIVATE)
         token = sharedPref.getString("jwtToken", null)
         currentUserId = sharedPref.getString("userId", "") ?: ""
 

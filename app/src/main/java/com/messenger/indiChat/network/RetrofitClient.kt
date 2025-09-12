@@ -26,7 +26,7 @@ object RetrofitClient {
             logging.level = HttpLoggingInterceptor.Level.BODY
 
             val authInterceptor = Interceptor { chain ->
-                val sharedPref = context.getSharedPreferences("MyAppPrefs", Context.MODE_PRIVATE)
+                val sharedPref = context.getSharedPreferences("indiChatPrefs", Context.MODE_PRIVATE)
                 val token = sharedPref.getString("jwtToken", null)
 
                 val requestBuilder = chain.request().newBuilder()
@@ -54,7 +54,7 @@ object RetrofitClient {
                                     Toast.makeText(context, "Session expired. Please login again.", Toast.LENGTH_LONG).show()
 
                                     // Clear saved token
-                                    val sharedPref = context.getSharedPreferences("MyAppPrefs", Context.MODE_PRIVATE)
+                                    val sharedPref = context.getSharedPreferences("indiChatPrefs", Context.MODE_PRIVATE)
                                     sharedPref.edit().remove("jwtToken").apply()
 
                                     // Redirect to LoginActivity

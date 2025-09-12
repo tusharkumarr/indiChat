@@ -1,5 +1,6 @@
 package com.messenger.indiChat.Activity
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.Gravity
 import android.widget.ImageView
@@ -52,7 +53,17 @@ class HomeActivity : AppCompatActivity() {
                         Toast.makeText(this, "Profile clicked", Toast.LENGTH_SHORT).show(); true
                     }
                     R.id.action_logout -> {
-                        Toast.makeText(this, "Logout clicked", Toast.LENGTH_SHORT).show(); true
+                        val sharedPref = getSharedPreferences("indiChatPrefs", MODE_PRIVATE)
+                        sharedPref.edit().clear().apply()
+
+                        Toast.makeText(this, "Logged out successfully", Toast.LENGTH_SHORT).show()
+
+                        val intent = Intent(this, LoginActivity::class.java)
+                        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                        startActivity(intent)
+
+                        finish()
+                        true
                     }
                     R.id.action_settings -> {
                         Toast.makeText(this, "Settings clicked", Toast.LENGTH_SHORT).show(); true

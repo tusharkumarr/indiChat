@@ -66,7 +66,7 @@ class LoginActivity : AppCompatActivity() {
                 btnLogin.isEnabled = true
 
                 if (loginData != null) {
-                    val sharedPref = getSharedPreferences("MyAppPrefs", MODE_PRIVATE)
+                    val sharedPref = getSharedPreferences("indiChatPrefs", MODE_PRIVATE)
                     with(sharedPref.edit()) {
                         putBoolean("isLoggedIn", true)
                         putString("userId", userId)
