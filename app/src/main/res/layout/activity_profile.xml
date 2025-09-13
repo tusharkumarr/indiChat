@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
 <androidx.coordinatorlayout.widget.CoordinatorLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -5,26 +6,42 @@
     android:layout_height="match_parent"
     android:background="@color/white">
 
+    <!-- Back Button -->
+    <ImageView
+        android:id="@+id/btnBack"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_margin="16dp"
+        android:src="@drawable/ic_arrow_back"
+        android:contentDescription="Back"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:padding="8dp"
+        android:clickable="true"
+        android:focusable="true"/>
+
     <!-- Profile main content -->
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:padding="24dp"
-        android:clipToPadding="false">
+        android:clipToPadding="false"
+        android:fillViewport="true">
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:orientation="vertical"
-            android:gravity="center_horizontal">
+            android:gravity="center">
 
             <!-- Profile Card -->
             <androidx.cardview.widget.CardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 app:cardCornerRadius="16dp"
-                app:cardElevation="8dp"
-                android:padding="24dp">
+                app:cardElevation="12dp"
+                android:padding="24dp"
+                android:layout_margin="8dp"
+                android:background="@drawable/profile_card_bg">
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -34,21 +51,21 @@
 
                     <ImageView
                         android:id="@+id/profileImage"
-                        android:layout_width="100dp"
-                        android:layout_height="100dp"
+                        android:layout_width="120dp"
+                        android:layout_height="120dp"
                         android:src="@drawable/ic_launcher_foreground"
                         android:contentDescription="Profile Picture"
                         android:background="@drawable/circle_background"
-                        android:padding="6dp" />
+                        android:padding="8dp" />
 
                     <TextView
                         android:id="@+id/profileName"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="John Doe"
-                        android:textSize="20sp"
+                        android:textSize="22sp"
                         android:textStyle="bold"
-                        android:layout_marginTop="12dp"
+                        android:layout_marginTop="16dp"
                         android:textColor="@color/black"/>
 
                     <TextView
@@ -58,7 +75,7 @@
                         android:text="9999999999"
                         android:textSize="16sp"
                         android:textColor="@color/gray"
-                        android:layout_marginTop="4dp" />
+                        android:layout_marginTop="8dp" />
 
                 </LinearLayout>
             </androidx.cardview.widget.CardView>
@@ -66,7 +83,7 @@
         </LinearLayout>
     </ScrollView>
 
-    <!-- Stylish Bottom Sheet -->
+    <!-- Bottom Sheet -->
     <LinearLayout
         android:id="@+id/bottomSheet"
         android:layout_width="match_parent"
@@ -85,23 +102,33 @@
             android:layout_gravity="center"
             android:layout_marginBottom="16dp"/>
 
-        <!-- Bottom Sheet Content -->
+        <!-- Bottom Sheet Title -->
         <TextView
             android:id="@+id/bottomSheetTitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="More About You"
+            android:text="My Reels"
             android:textSize="18sp"
             android:textStyle="bold"
-            android:textColor="@color/purple_500"/>
+            android:textColor="@color/purple_500"
+            android:layout_marginBottom="8dp"/>
 
-        <TextView
+        <!-- RecyclerView for reels -->
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recyclerReels"
             android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:padding="4dp"/>
+
+        <!-- ProgressBar -->
+        <ProgressBar
+            android:id="@+id/progressBar"
+            style="?android:attr/progressBarStyleLarge"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Here you can show additional info, recent activity, or settings."
-            android:textSize="14sp"
-            android:textColor="@color/gray"
-            android:layout_marginTop="8dp"/>
+            android:layout_gravity="center"
+            android:visibility="gone"/>
 
     </LinearLayout>
 
