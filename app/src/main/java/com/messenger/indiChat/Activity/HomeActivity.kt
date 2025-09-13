@@ -50,7 +50,9 @@ class HomeActivity : AppCompatActivity() {
             popup.setOnMenuItemClickListener { item ->
                 when(item.itemId){
                     R.id.action_myprofile -> {
-                        Toast.makeText(this, "Profile clicked", Toast.LENGTH_SHORT).show(); true
+                        val intent = Intent(this, ProfileActivity::class.java)
+                        startActivity(intent)
+                        true
                     }
                     R.id.action_logout -> {
                         val sharedPref = getSharedPreferences("indiChatPrefs", MODE_PRIVATE)
