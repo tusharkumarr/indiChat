@@ -6,19 +6,6 @@
     android:layout_height="match_parent"
     android:background="@color/white">
 
-    <!-- Back Button -->
-    <ImageView
-        android:id="@+id/btnBack"
-        android:layout_width="40dp"
-        android:layout_height="40dp"
-        android:layout_margin="16dp"
-        android:src="@drawable/ic_arrow_back"
-        android:contentDescription="Back"
-        android:background="?attr/selectableItemBackgroundBorderless"
-        android:padding="8dp"
-        android:clickable="true"
-        android:focusable="true"/>
-
     <!-- Profile main content -->
     <ScrollView
         android:layout_width="match_parent"
@@ -129,7 +116,19 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:visibility="gone"/>
-
     </LinearLayout>
 
+    <!-- Back Button (Move last in XML to bring to front) -->
+    <ImageView
+        android:id="@+id/btnBack"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_margin="16dp"
+        android:src="@drawable/ic_arrow_back"
+        android:contentDescription="Back"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:padding="8dp"
+        android:clickable="true"
+        android:focusable="true"
+        app:tint="@android:color/black"/>
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

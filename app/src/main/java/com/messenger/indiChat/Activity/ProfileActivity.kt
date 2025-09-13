@@ -3,6 +3,7 @@ package com.messenger.indiChat.Activity
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.view.View
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.ProgressBar
@@ -44,13 +45,14 @@ class ProfileActivity : AppCompatActivity() {
         bottomSheetBehavior.peekHeight = 300
         bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
 
-        recyclerReels = findViewById(R.id.recyclerReels)
-        progressBar = findViewById(R.id.progressBar)
-
+        // Back button
         val btnBack = findViewById<ImageView>(R.id.btnBack)
         btnBack.setOnClickListener {
             finish()
         }
+
+        recyclerReels = findViewById(R.id.recyclerReels)
+        progressBar = findViewById(R.id.progressBar)
 
         recyclerReels.layoutManager = GridLayoutManager(this, 3)
 
@@ -70,8 +72,8 @@ class ProfileActivity : AppCompatActivity() {
 
     private fun loadReels() {
         lifecycleScope.launch {
-            progressBar.visibility = android.view.View.VISIBLE
-            recyclerReels.visibility = android.view.View.GONE
+            progressBar.visibility = View.VISIBLE
+            recyclerReels.visibility = View.GONE
 
             try {
                 val response = reelRepository.getHybridRecommendations(
@@ -84,9 +86,12 @@ class ProfileActivity : AppCompatActivity() {
                     if (body != null && body.success) {
                         val reels = body.data ?: emptyList<Reel>()
 
-                        // ✅ Set adapter with click opening ReelPlayerActivity
+                        // Set adapter with click opening ReelPlayerActivity
                         recyclerReels.adapter = ReelsAdapter(reels) { reel ->
-                            val intent = Intent(this@ProfileActivity, ReelPlayerActivity::class.java)
+                            val intent = Intent(
+                                this@ProfileActivity,
+                                ReelPlayerActivity::class.java
+                            )
                             intent.putExtra("thumbnailGif", reel.thumbnailGif)
                             intent.putExtra("videoUrl", reel.videoUrl)
                             intent.putExtra("caption", reel.caption)
@@ -94,9 +99,8 @@ class ProfileActivity : AppCompatActivity() {
                             startActivity(intent)
                         }
 
-                        recyclerReels.visibility = android.view.View.VISIBLE
+                        recyclerReels.visibility = View.VISIBLE
                     } else {
-                        // Show message if no reels found
                         android.widget.Toast.makeText(
                             this@ProfileActivity,
                             body?.message ?: "No reels found",
@@ -118,7 +122,7 @@ class ProfileActivity : AppCompatActivity() {
                     android.widget.Toast.LENGTH_SHORT
                 ).show()
             } finally {
-                progressBar.visibility = android.view.View.GONE
+                progressBar.visibility = View.GONE
             }
         }
     }

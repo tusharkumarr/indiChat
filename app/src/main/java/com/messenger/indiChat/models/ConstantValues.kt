@@ -3,7 +3,7 @@ package com.messenger.indiChat.models
 import android.content.Context
 
 object ConstantValues {
-    private const val env = "dev" // change to "prod" when needed
+    private const val env = "prod" // change to "prod" when needed
 
     private val BASE_URL: String = when (env) {
         "dev" -> "10.0.2.2:8080"   // Localhost for emulator
